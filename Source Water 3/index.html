@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sediment of Silence — Part III</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground:  #0d0f0e;
+    --bone:    #d8d3c6;
+    --bone-dim:#9a958a;
+    --iron:    #6d7370;
+    --silt:    #7c8a6f;
+    --silt-dim:#4a5344;
+    --still:   #efe9da;
+
+    --serif: 'Source Serif 4', Georgia, serif;
+    --display: 'Cormorant Garamond', serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+    --murk: 0;
+    --bed: 0px;      /* how deep the sediment has grown */
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--bone);
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 19px;
+    line-height: 1.72;
+    overflow-x: hidden;
+  }
+
+  /* ---------- silt in suspension: clouds fast, settles slow ---------- */
+  #silt { position: fixed; inset: 0; z-index: 3; pointer-events: none; opacity: calc(var(--murk) * 0.9); }
+  .haze {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background:
+      radial-gradient(70% 60% at 50% 40%, rgba(74,83,68,0.55), transparent 78%),
+      linear-gradient(180deg, rgba(20,23,21,0.35), rgba(13,15,14,0.6));
+    opacity: calc(var(--murk) * 0.85);
+    transition: opacity 90ms linear;
+  }
+  main {
+    position: relative; z-index: 1;
+    filter: blur(calc(var(--murk) * 2.1px));
+    opacity: calc(1 - var(--murk) * 0.32);
+  }
+
+  /* ==================================================================
+     THE BED. Everything you read settles here. It does not clear.
+     Reading is deposition. You are adding to it right now.
+     ================================================================== */
+  .bed {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: var(--bed);
+    z-index: 4;
+    pointer-events: none;
+    overflow: hidden;
+    transition: height 1.6s cubic-bezier(0.16,1,0.3,1);
+  }
+  .bed::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(13,15,14,0) 0%,
+      rgba(16,18,16,0.72) 14%,
+      rgba(12,14,12,0.94) 46%,
+      rgba(9,11,10,1) 100%);
+  }
+  .bed::after {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,138,111,0.30) 20%, rgba(124,138,111,0.30) 80%, transparent);
+  }
+
+  .bed__depth {
+    position: absolute; right: 22px; top: 10px;
+    font-family: var(--mono); font-size: 8px; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--silt-dim);
+  }
+
+  .deposit {
+    position: absolute;
+    font-family: var(--display);
+    font-style: italic;
+    white-space: nowrap;
+    color: var(--silt);
+    opacity: 0;
+    animation: settleDown 2.8s cubic-bezier(0.5,0,0.75,0.2) forwards;
+  }
+  @keyframes settleDown {
+    0%   { opacity: 0;   transform: translateY(-46px); }
+    22%  { opacity: 0.62; }
+    100% { opacity: var(--rest); transform: translateY(0); }
+  }
+
+  /* the one glint. it finds nothing. */
+  .glint {
+    position: absolute; top: 0; bottom: 0; width: 200px;
+    background: linear-gradient(100deg, transparent, rgba(216,211,198,0.10) 45%, transparent);
+    filter: blur(8px);
+    transform: translateX(-260px);
+    opacity: 0;
+  }
+  .glint.search { animation: search 6.5s cubic-bezier(0.4,0,0.6,1) forwards; }
+  @keyframes search {
+    0%   { transform: translateX(-260px); opacity: 0; }
+    12%  { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateX(calc(100vw + 60px)); opacity: 0; }
+  }
+
+  /* the flood that has not come yet */
+  .bed.stir { animation: stir 9s ease-in-out infinite; }
+  @keyframes stir {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-5px); }
+  }
+
+  /* ---------- the gauge ---------- */
+  .gauge {
+    position: fixed; top: 0; left: 0; height: 100vh; width: 108px; z-index: 5;
+    pointer-events: none; font-family: var(--mono); font-size: 8.5px;
+    letter-spacing: 0.22em; color: var(--iron); text-transform: uppercase;
+  }
+  .gauge__rail { position: absolute; left: 62px; top: 96px; bottom: 96px; width: 1px;
+                 background: linear-gradient(180deg, var(--silt-dim), rgba(109,115,112,0.25)); }
+  .gauge__strata { position: absolute; left: 52px; top: 96px; bottom: 96px; width: 22px; }
+  .gauge__strata i { position: absolute; left: 0; width: 100%; height: 1px; background: rgba(109,115,112,0.30); }
+  .gauge__strata i.major { background: rgba(124,138,111,0.6); width: 32px; }
+  .gauge__mark { position: absolute; left: 55px; width: 15px; height: 1.5px; background: var(--bone);
+                 box-shadow: 0 0 8px rgba(216,211,198,0.5); }
+  .gauge__head { position: absolute; top: 62px; left: 20px; writing-mode: vertical-rl; text-orientation: mixed; color: var(--silt); }
+  .gauge__read { position: absolute; left: 84px; transform: translateY(-50%); white-space: nowrap;
+                 color: var(--bone-dim); letter-spacing: 0.16em; }
+  .gauge__foot { position: absolute; bottom: 58px; left: 20px; writing-mode: vertical-rl; text-orientation: mixed; }
+
+  /* ---------- column ---------- */
+  .column { max-width: 640px; margin: 0 auto; padding: 22vh 32px 46vh; }
+
+  .part { font-family: var(--mono); font-size: 10px; letter-spacing: 0.42em;
+          text-transform: uppercase; color: var(--silt); margin-bottom: 14px; }
+  .title { font-family: var(--display); font-weight: 300; font-size: clamp(40px, 6.4vw, 72px);
+           line-height: 0.98; letter-spacing: -0.012em; color: var(--bone); margin-bottom: 4vh; }
+  .rule { height: 1px; width: 100%; background: linear-gradient(90deg, var(--silt-dim), transparent); margin-bottom: 12vh; }
+
+  /* Part III breathes differently. It is not argument. It is deposition. */
+  .stanza {
+    font-size: 20px;
+    line-height: 1.9;
+    margin-bottom: 3.2em;
+    color: var(--bone);
+  }
+  .stanza.lede { font-size: 22px; }
+  em, i { font-style: italic; }
+
+  /* ==================================================================
+     THE REFRAIN. In Part I it swept sideways. Here it sinks.
+     Each time it returns, it comes to rest a little lower and a
+     little dimmer, because it is being buried like everything else.
+     ================================================================== */
+  .refrain {
+    position: relative;
+    font-family: var(--display); font-style: italic; font-weight: 300;
+    font-size: 24px; line-height: 1.3; color: var(--silt);
+    margin: 3.6em 0 4.6em;
+    white-space: nowrap;
+  }
+  .refrain::before {
+    content: ""; position: absolute; left: -100vw; right: calc(100% + 22px); top: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,138,111,0.32));
+  }
+  .refrain.rise { opacity: 0; transform: translateY(-30px); }
+  .refrain.rise.up { animation: bury 2.9s cubic-bezier(0.45,0,0.75,0.25) forwards; }
+  @keyframes bury {
+    0%   { opacity: 0; transform: translateY(-30px); }
+    30%  { opacity: 1; }
+    100% { opacity: var(--rest, 1); transform: translateY(var(--down, 0px)); }
+  }
+
+  /* ---------- entrance ---------- */
+  .rise { opacity: 0; transform: translateY(14px); }
+  .rise.up { animation: rise 1.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  .end { margin-top: 14vh; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.34em;
+         text-transform: uppercase; color: var(--iron); }
+
+  /* ---------- quality floor ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    main { filter: none !important; opacity: 1 !important; }
+    #silt, .haze, .glint { display: none; }
+    .rise, .refrain.rise { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .bed { height: 0 !important; }
+    .bed.stir { animation: none; }
+  }
+
+  @media (max-width: 860px) { .gauge { display: none; } }
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+    .column { padding: 14vh 22px 40vh; }
+    .stanza { font-size: 18px; }
+    .refrain { font-size: 20px; white-space: normal; }
+    .refrain::before { display: none; }
+    .deposit { font-size: 13px !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="silt"></canvas>
+<div class="haze"></div>
+
+<div class="bed" id="bed" aria-hidden="true">
+  <div class="glint" id="glint"></div>
+  <div class="bed__depth" id="depth">sediment · 0</div>
+</div>
+
+<aside class="gauge" aria-hidden="true">
+  <div class="gauge__head">Upstream</div>
+  <div class="gauge__rail"></div>
+  <div class="gauge__strata" id="strata"></div>
+  <div class="gauge__mark" id="mark"></div>
+  <div class="gauge__read" id="read">0.00 · surface</div>
+  <div class="gauge__foot">Source</div>
+</aside>
+
+<main>
+  <article class="column">
+
+    <div class="part rise">Part III</div>
+    <h1 class="title rise">The Sediment of Silence</h1>
+    <div class="rule rise"></div>
+
+    <p class="stanza lede rise" data-silt="the stillness after an identity is not spoken">There is silence in a river, yet it is not empty.</p>
+
+    <p class="stanza rise" data-silt="a question met with turned faces">It is the stillness after an identity is not spoken. It is the quiet after a trauma is witnessed and left alone. It is the thickness that settles when a question is met with turned faces, with eyes finding the ground.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" data-silt="a father’s warning that never became a word">There are stones on the bottom, sharp with what was swallowed, heavy with what was left unsaid. A father’s warning that never became a word. A mother’s grief that vanished. A brother who heard the door and let it close. A neighbor who saw and chose not to remember.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" data-silt="each omission dropping, each refusal sinking">This is burial. Not in earth, yet in water, each omission dropping, each refusal sinking, each secret sifting down into the coldest of silt.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" data-silt="what their ancestors could not bear">Generations stand on these beds. They plant crops and dig wells and drink from currents clouded by what their ancestors could not bear, would not speak.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" id="child" data-silt="water thick with silt and old silence">Somewhere a child stands at the bank, searches the shallows for what glints, and finds only water thick with silt and old silence—the truth buried beneath layers, pushed down by the force of centuries.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" data-silt="no innocent hands at the water’s edge">There are no innocent hands at the water’s edge. Only those willing to wade in, to disturb the sediment, to bring up what others let rest.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" data-silt="old prayers lost in the dark channel">There is a heaviness that cannot be washed away. Old lies made into stones, old identities lost among the pebbles, old prayers lost in the dark channel.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" data-silt="every breath held until the moment passes">We inherit the silence of those who stood before us. We add to it with every unspoken word, every glance away, every breath held until the moment passes.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="stanza rise" id="wait" data-silt="it waits for a season of flood">And what is buried is not lost. It directs the current, it claims the bottom, it waits for a season of flood, when the river will turn and reveal what no one wanted to remember.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <div class="end rise">End of Part III</div>
+
+  </article>
+</main>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+  const bed = document.getElementById('bed');
+  const depthLabel = document.getElementById('depth');
+  const glint = document.getElementById('glint');
+
+  /* ---------- the refrain sinks a little deeper each time ---------- */
+  const refrains = Array.from(document.querySelectorAll('.refrain'));
+  refrains.forEach((r, i) => {
+    const t = i / Math.max(1, refrains.length - 1);
+    r.style.setProperty('--down', (t * 16).toFixed(1) + 'px');
+    r.style.setProperty('--rest', (1 - t * 0.42).toFixed(3));
+  });
+
+  /* ---------- entrance ---------- */
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('up'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+  /* ==================================================================
+     DEPOSITION. When a stanza passes above you, it does not leave.
+     It settles. The bed thickens. Nothing you read is discarded.
+     ================================================================== */
+  const stanzas = Array.from(document.querySelectorAll('[data-silt]'));
+  let deposited = 0;
+  const MAX_BED = Math.min(240, Math.round(innerHeight * 0.26));
+
+  if (!reduce) {
+    const dep = new IntersectionObserver(es => {
+      es.forEach(e => {
+        // fires when the stanza has scrolled fully above the viewport
+        if (!e.isIntersecting && e.boundingClientRect.top < 0) {
+          deposit(e.target);
+          dep.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0 });
+    stanzas.forEach(s => dep.observe(s));
+  }
+
+  function deposit(el) {
+    const phrase = el.dataset.silt;
+    if (!phrase) return;
+    deposited++;
+
+    const n = deposited;
+    const span = document.createElement('span');
+    span.className = 'deposit';
+    span.textContent = phrase;
+
+    // each layer rests a little lower in the column of silt, and a little dimmer
+    const layerFromBottom = Math.max(4, MAX_BED - n * 15);
+    span.style.bottom = layerFromBottom + 'px';
+    span.style.left = (6 + Math.random() * 46) + '%';
+    span.style.fontSize = (16 - Math.min(n, 8) * 0.7).toFixed(1) + 'px';
+    span.style.setProperty('--rest', Math.max(0.10, 0.46 - n * 0.028).toFixed(3));
+    span.style.transform = 'rotate(' + ((Math.random() - 0.5) * 1.6).toFixed(2) + 'deg)';
+
+    bed.appendChild(span);
+
+    const h = Math.min(MAX_BED, 26 + n * 17);
+    root.style.setProperty('--bed', h + 'px');
+    if (depthLabel) depthLabel.textContent = 'sediment · ' + n;
+  }
+
+  /* ---------- the child searches the shallows and finds nothing ---------- */
+  if (!reduce && glint) {
+    const g = new IntersectionObserver(es => {
+      es.forEach(e => {
+        if (e.isIntersecting) { glint.classList.add('search'); g.disconnect(); }
+      });
+    }, { threshold: 0.6 });
+    const child = document.getElementById('child');
+    if (child) g.observe(child);
+  }
+
+  /* ---------- what is buried waits for a season of flood ---------- */
+  if (!reduce) {
+    const s = new IntersectionObserver(es => {
+      es.forEach(e => { if (e.isIntersecting) { bed.classList.add('stir'); s.disconnect(); } });
+    }, { threshold: 0.5 });
+    const wait = document.getElementById('wait');
+    if (wait) s.observe(wait);
+  }
+
+  /* ---------- gauge ---------- */
+  const strata = document.getElementById('strata');
+  const mark = document.getElementById('mark');
+  const read = document.getElementById('read');
+  if (strata) {
+    for (let i = 0; i <= 40; i++) {
+      const t = document.createElement('i');
+      t.style.top = (i * 2.5) + '%';
+      if (i % 5 === 0) t.className = 'major';
+      strata.appendChild(t);
+    }
+  }
+
+  /* ---------- silt in suspension ---------- */
+  const cv = document.getElementById('silt');
+  const ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+  let W = 0, H = 0;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const grains = [];
+
+  function size() {
+    W = innerWidth; H = innerHeight;
+    if (!cv) return;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size();
+  addEventListener('resize', size);
+
+  for (let i = 0; i < 220; i++) {
+    grains.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.7 + 0.4,
+      vy: Math.random() * 0.10 + 0.02,
+      vx: (Math.random() - 0.5) * 0.05,
+      a: Math.random() * 0.5 + 0.15,
+      ph: Math.random() * Math.PI * 2
+    });
+  }
+
+  let lastY = scrollY, vel = 0, murk = 0;
+
+  function frame() {
+    requestAnimationFrame(frame);
+
+    const y = scrollY;
+    const dy = Math.abs(y - lastY);
+    lastY = y;
+
+    vel += (dy - vel) * 0.35;
+    const target = Math.min(vel / 14, 1);
+    const k = target > murk ? 0.22 : 0.014;
+    murk += (target - murk) * k;
+    if (murk < 0.0008) murk = 0;
+    root.style.setProperty('--murk', murk.toFixed(4));
+
+    const max = Math.max(1, document.body.scrollHeight - innerHeight);
+    const p = Math.min(y / max, 1);
+    if (mark && read) {
+      const railTop = 96, railH = innerHeight - 192;
+      const top = railTop + railH * (1 - p);
+      mark.style.top = top + 'px';
+      read.style.top = top + 'px';
+      read.textContent = p.toFixed(2) + (p > 0.985 ? ' · source' : p < 0.01 ? ' · surface' : ' · upstream');
+    }
+
+    if (ctx) {
+      if (murk < 0.006) { ctx.clearRect(0, 0, W, H); return; }
+      ctx.clearRect(0, 0, W, H);
+      const density = 0.35 + murk * 0.65;
+      for (const g of grains) {
+        g.ph += 0.01;
+        g.y += g.vy * 0.0016 + murk * 0.0022;
+        g.x += (g.vx + Math.sin(g.ph) * 0.25) * 0.0008;
+        if (g.y > 1.02) { g.y = -0.02; g.x = Math.random(); }
+        if (g.x > 1.02) g.x = -0.02;
+        if (g.x < -0.02) g.x = 1.02;
+        ctx.beginPath();
+        ctx.arc(g.x * W, g.y * H, g.r * (0.6 + murk * 0.9), 0, 6.2832);
+        ctx.fillStyle = 'rgba(124,138,111,' + (g.a * density * murk).toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+  }
+
+  if (!reduce) frame();
+  else document.querySelectorAll('.rise').forEach(el => el.classList.add('up'));
+})();
+</script>
+
+</body>
+</html>

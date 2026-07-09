@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sorry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --field:  #1a1a18;
+    --page:   #07080a;
+    --blood:  #b62c20;
+    --voice:  #7aafc8;
+    --voice-2:#6692a6;
+    --cold:   #50768e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--field);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .page {
+    width: 660px;
+    height: 880px;
+    background: var(--page);
+    box-shadow: 0 8px 60px rgba(0,0,0,.6);
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    animation: pageIn 2.2s ease forwards;
+  }
+  @keyframes pageIn { to { opacity: 1; } }
+
+  /* the cold breathes in the dark behind everything */
+  .page::before {
+    content: "";
+    position: absolute; inset: -25%;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(42% 34% at 46% 26%, rgba(182,44,32,0.055), transparent 70%),
+                radial-gradient(50% 40% at 62% 78%, rgba(80,118,142,0.05), transparent 72%);
+    animation: coldBreath 30s ease-in-out infinite alternate;
+  }
+  @keyframes coldBreath {
+    0%   { transform: translate(-1.5%, 1%)  scale(1); }
+    100% { transform: translate(1.5%, -1%) scale(1.09); }
+  }
+
+  .page > span, .page > .stack-line { z-index: 2; }
+
+  /* ------------------------------------------------------------------
+     THE STACK. The word says itself, again, again, and each saying
+     costs it a letter. What has fallen off does not come back.
+     ------------------------------------------------------------------ */
+  .stack-line {
+    position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    white-space: nowrap;
+    line-height: 1;
+    color: var(--blood);
+    will-change: opacity, transform;
+  }
+  .stack-line .ltr { display: inline-block; }
+
+  /* a saying passes through the line */
+  .stack-line.speak { animation: speak 900ms cubic-bezier(0.2,0,0.1,1); }
+  @keyframes speak {
+    0%   { filter: brightness(1);    transform: translateX(0); }
+    14%  { filter: brightness(2.15); transform: translateX(-1px); }
+    100% { filter: brightness(1);    transform: translateX(0); }
+  }
+
+  /* the tail letters let go */
+  .ltr.shed { animation: shed 1.15s cubic-bezier(0.5,0,0.75,0) forwards; }
+  @keyframes shed {
+    0%   { opacity: inherit; transform: translate(0,0) rotate(0deg); }
+    18%  { transform: translate(1px, 2px) rotate(4deg); }
+    100% { opacity: 0; transform: translate(6px, 74px) rotate(38deg); }
+  }
+  .ltr.gone { display: none; }
+
+  /* down to nothing — the period keeps its faint pulse forever */
+  .terminal { animation: terminal 6s ease-in-out infinite; }
+  @keyframes terminal {
+    0%,100% { opacity: 0.035; }
+    50%     { opacity: 0.10; }
+  }
+
+  /* ------------------------------------------------------------------
+     THE COIN. What the stack spends, the debt receives.
+     ------------------------------------------------------------------ */
+  .coin {
+    position: absolute;
+    top: 396px; left: 299px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blood);
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .coin.spend { animation: spend 2.5s cubic-bezier(0.42,0,0.9,1) forwards, flip 0.34s linear 8; }
+  @keyframes spend {
+    0%   { opacity: 0;    transform: translate(0,0) ; }
+    9%   { opacity: 0.95; }
+    82%  { opacity: 0.85; }
+    100% { opacity: 0;    transform: translate(30px, 168px); }
+  }
+  @keyframes flip {
+    0%,100% { width: 8px; }
+    50%     { width: 1.5px; }
+  }
+
+  #grows {
+    transform-origin: left center;
+    transition: transform 1.4s cubic-bezier(0.16,1,0.3,1),
+                letter-spacing 1.4s cubic-bezier(0.16,1,0.3,1),
+                color 1.8s ease;
+    will-change: transform;
+  }
+
+  /* the ledger voice: typed, flat, unrepentant */
+  .ledger { overflow: hidden; }
+  .ledger.type {
+    animation: typeIn 1.5s steps(20, end) forwards;
+    clip-path: inset(0 100% 0 0);
+  }
+  @keyframes typeIn { to { clip-path: inset(0 0 0 0); } }
+  .caret { display: none; }
+  .caret.on { display: inline; animation: caret 1.05s steps(1) infinite; }
+  @keyframes caret { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+
+  /* addressed into an absence */
+  .absence { animation: absence 13s ease-in-out infinite; }
+  @keyframes absence {
+    0%,100% { opacity: 0.42; transform: translateX(0); }
+    50%     { opacity: 1;    transform: translateX(3px); }
+  }
+  .absence.later { animation-delay: 1.6s; }
+
+  /* the arms reach and fall short */
+  .reach { animation: reach 17s cubic-bezier(0.4,0,0.6,1) infinite; }
+  @keyframes reach {
+    0%,100% { transform: translateX(0);    opacity: 1; }
+    46%     { transform: translateX(11px); opacity: 0.72; }
+    58%     { transform: translateX(9px);  opacity: 0.7; }
+  }
+
+  /* you. receding. never gone. */
+  #you { animation: recede 21s cubic-bezier(0.33,0,0.2,1) infinite alternate; }
+  @keyframes recede {
+    0%   { opacity: 0.45; transform: translateX(0)   scale(1); }
+    100% { opacity: 0.11; transform: translateX(17px) scale(0.94); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .page { opacity: 1; }
+    .coin { display: none; }
+    .caret { display: none !important; }
+    .ledger { clip-path: none !important; }
+    #you { opacity: 0.45; }
+  }
+
+  @media (max-width: 720px) {
+    body { padding: 16px 8px; }
+    .page {
+      width: 100%;
+      max-width: 660px;
+      height: auto;
+      aspect-ratio: 660 / 880;
+      transform-origin: top center;
+    }
+    .scaler { transform-origin: top left; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="scaler" style="position:absolute; inset:0;">
+
+    <span style="position:absolute;top:58px;left:60px;font-size:23px;color:rgb(122,175,200);opacity:1.0;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">I have worn the word</span>
+
+    <!-- the stack: every line begins whole -->
+    <span class="stack-line" data-keep="5" data-i="0" style="top:104px;left:237.5px;font-size:50px;opacity:1.0;"></span>
+    <span class="stack-line" data-keep="5" data-i="1" style="top:156px;left:246.25px;font-size:43px;opacity:0.86;letter-spacing:1.26px;"></span>
+    <span class="stack-line" data-keep="5" data-i="2" style="top:200px;left:255.0px;font-size:36px;opacity:0.72;letter-spacing:2.52px;"></span>
+    <span class="stack-line" data-keep="4" data-i="3" style="top:237px;left:270.0px;font-size:30px;opacity:0.58;letter-spacing:3.6px;"></span>
+    <span class="stack-line" data-keep="4" data-i="4" style="top:269px;left:275.0px;font-size:25px;opacity:0.46;letter-spacing:4.5px;"></span>
+    <span class="stack-line" data-keep="3" data-i="5" style="top:296px;left:284.25px;font-size:21px;opacity:0.36;letter-spacing:5.22px;"></span>
+    <span class="stack-line" data-keep="3" data-i="6" style="top:318px;left:287.25px;font-size:17px;opacity:0.27;letter-spacing:5.94px;"></span>
+    <span class="stack-line" data-keep="2" data-i="7" style="top:338px;left:293.0px;font-size:14px;opacity:0.2;letter-spacing:6.48px;"></span>
+    <span class="stack-line" data-keep="2" data-i="8" style="top:355px;left:294.5px;font-size:11px;opacity:0.145;letter-spacing:7.02px;"></span>
+    <span class="stack-line" data-keep="1" data-i="9" style="top:369px;left:297.75px;font-size:9px;opacity:0.09;letter-spacing:7.38px;"></span>
+
+    <span class="terminal" style="position:absolute;top:381px;left:298.0px;font-size:8px;color:rgb(182,44,32);opacity:0.06;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;letter-spacing:7.56px;">.</span>
+
+    <span id="nothing" style="position:absolute;top:402px;left:256px;font-size:15px;color:rgb(80,118,142);opacity:0;font-family:'Courier Prime',monospace;font-weight:300;white-space:nowrap;line-height:1;transition:opacity 2.4s ease;">down to nothing</span>
+
+    <div class="coin" id="coin"></div>
+
+    <span class="absence" style="position:absolute;top:150px;left:404px;font-size:21px;color:rgb(122,175,200);font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">saying it into the place</span>
+    <span class="absence later" style="position:absolute;top:196px;left:430px;font-size:20px;color:rgb(102,146,166);font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">you used to stand</span>
+
+    <span style="position:absolute;top:470px;left:70px;font-size:21px;color:rgb(122,175,200);opacity:1.0;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;">It is a coin I keep spending</span>
+    <span style="position:absolute;top:512px;left:150px;font-size:18px;color:rgb(102,146,166);opacity:1.0;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">on a debt that only</span>
+    <span id="grows" style="position:absolute;top:556px;left:300px;font-size:30px;color:rgb(102,146,166);opacity:1.0;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">grows</span>
+
+    <span class="ledger" id="led1" style="position:absolute;top:628px;left:250px;font-size:16px;color:rgb(80,118,142);opacity:1.0;font-family:'Courier Prime',monospace;font-weight:300;white-space:nowrap;line-height:1;">I know this.</span>
+    <span class="ledger" id="led2" style="position:absolute;top:654px;left:250px;font-size:16px;color:rgb(80,118,142);opacity:1.0;font-family:'Courier Prime',monospace;font-weight:300;white-space:nowrap;line-height:1;">I spend it anyway.<span class="caret" id="caret">_</span></span>
+
+    <span style="position:absolute;top:744px;left:64px;font-size:22px;color:rgb(122,175,200);opacity:1.0;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;">What else does a man do with his arms</span>
+    <span class="reach" style="position:absolute;top:788px;left:150px;font-size:20px;color:rgb(102,146,166);opacity:1.0;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">once they have emptied themselves of</span>
+    <span id="you" style="position:absolute;top:820px;left:560px;font-size:22px;color:rgb(80,118,142);opacity:0.45;font-family:'Cormorant Garamond',serif;font-weight:300;white-space:nowrap;line-height:1;font-style:italic;">you</span>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const WORD = 'sorry';
+  const lines = Array.from(document.querySelectorAll('.stack-line'));
+
+  /* Build each line whole. The erosion has not happened yet. */
+  lines.forEach(line => {
+    const keep = +line.dataset.keep;
+    line.innerHTML = '';
+    for (let i = 0; i < WORD.length; i++) {
+      const s = document.createElement('span');
+      s.className = 'ltr' + (i >= keep ? ' extra' : '');
+      s.textContent = WORD[i];
+      line.appendChild(s);
+    }
+  });
+
+  if (reduce) {
+    lines.forEach(l => l.querySelectorAll('.extra').forEach(e => e.classList.add('gone')));
+    document.getElementById('nothing').style.opacity = '0.7';
+    document.getElementById('caret').classList.add('on');
+    return;
+  }
+
+  const nothing = document.getElementById('nothing');
+  const grows   = document.getElementById('grows');
+  const coin    = document.getElementById('coin');
+
+  /* ---- pass one: the saying descends, and costs a letter each time ---- */
+  let eroded = false;
+
+  function descend(onDone) {
+    let i = 0;
+    (function step() {
+      if (i >= lines.length) { onDone && onDone(); return; }
+      const line = lines[i];
+      line.classList.remove('speak');
+      void line.offsetWidth;
+      line.classList.add('speak');
+
+      if (!eroded) {
+        const extras = Array.from(line.querySelectorAll('.extra'));
+        extras.reverse().forEach((e, k) => {
+          setTimeout(() => {
+            e.classList.add('shed');
+            setTimeout(() => e.classList.add('gone'), 1150);
+          }, 120 + k * 130);
+        });
+      }
+
+      /* it says it faster each time, and smaller, and means it less */
+      const gap = 640 - i * 42;
+      i++;
+      setTimeout(step, Math.max(190, gap));
+    })();
+  }
+
+  descend(() => {
+    eroded = true;
+    setTimeout(() => { nothing.style.opacity = '0.7'; }, 700);
+    setTimeout(startLedger, 1500);
+    setTimeout(startSpending, 2600);
+    setInterval(() => descend(), 12000);   /* it never stops saying it */
+  });
+
+  /* ---- the ledger states the fact and does not stop ---- */
+  function startLedger() {
+    const l1 = document.getElementById('led1');
+    const l2 = document.getElementById('led2');
+    l1.classList.add('type');
+    setTimeout(() => l2.classList.add('type'), 1000);
+    setTimeout(() => document.getElementById('caret').classList.add('on'), 2600);
+  }
+
+  /* ---- every coin spent makes the debt larger ---- */
+  let debt = 1;
+  function startSpending() {
+    spend();
+    setInterval(spend, 3800);
+  }
+  function spend() {
+    coin.classList.remove('spend');
+    void coin.offsetWidth;
+    coin.classList.add('spend');
+
+    setTimeout(() => {
+      debt = Math.min(debt + 0.055, 1.42);
+      const t = (debt - 1) / 0.42;               /* 0 → 1 as the debt compounds */
+      const r = Math.round(102 + (182 - 102) * t * 0.55);
+      const g = Math.round(146 + (44 - 146) * t * 0.55);
+      const b = Math.round(166 + (32 - 166) * t * 0.55);
+      grows.style.transform = `scale(${debt.toFixed(3)})`;
+      grows.style.letterSpacing = (t * 3.2).toFixed(2) + 'px';
+      grows.style.color = `rgb(${r},${g},${b})`;
+    }, 2200);
+  }
+})();
+</script>
+
+</body>
+</html>

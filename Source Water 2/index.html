@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Dead Speak Forward — Part II</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground:  #0d0f0e;
+    --bone:    #d8d3c6;
+    --bone-dim:#9a958a;
+    --iron:    #6d7370;
+    --silt:    #7c8a6f;
+    --silt-dim:#4a5344;
+    --still:   #efe9da;
+
+    --serif: 'Source Serif 4', Georgia, serif;
+    --display: 'Cormorant Garamond', serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+    --murk: 0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--bone);
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 19px;
+    line-height: 1.72;
+    overflow-x: hidden;
+  }
+
+  /* ---- inherited physics: silt on velocity ---- */
+  #silt { position: fixed; inset: 0; z-index: 3; pointer-events: none; opacity: calc(var(--murk) * 0.9); }
+  .haze {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background:
+      radial-gradient(70% 60% at 50% 40%, rgba(74,83,68,0.55), transparent 78%),
+      linear-gradient(180deg, rgba(20,23,21,0.35), rgba(13,15,14,0.6));
+    opacity: calc(var(--murk) * 0.85);
+    transition: opacity 90ms linear;
+  }
+  main {
+    position: relative; z-index: 1;
+    filter: blur(calc(var(--murk) * 2.1px));
+    opacity: calc(1 - var(--murk) * 0.32);
+  }
+
+  /* ---- the gauge ---- */
+  .gauge {
+    position: fixed; top: 0; left: 0; height: 100vh; width: 108px;
+    z-index: 5; pointer-events: none;
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.22em;
+    color: var(--iron); text-transform: uppercase;
+  }
+  .gauge__rail { position: absolute; left: 62px; top: 96px; bottom: 96px; width: 1px;
+                 background: linear-gradient(180deg, var(--silt-dim), rgba(109,115,112,0.25)); }
+  .gauge__strata { position: absolute; left: 52px; top: 96px; bottom: 96px; width: 22px; }
+  .gauge__strata i { position: absolute; left: 0; width: 100%; height: 1px; background: rgba(109,115,112,0.30); }
+  .gauge__strata i.major { background: rgba(124,138,111,0.6); width: 32px; }
+  .gauge__mark { position: absolute; left: 55px; width: 15px; height: 1.5px; background: var(--bone);
+                 box-shadow: 0 0 8px rgba(216,211,198,0.5); }
+  .gauge__head { position: absolute; top: 62px; left: 20px; writing-mode: vertical-rl; color: var(--silt); }
+  .gauge__read { position: absolute; left: 84px; transform: translateY(-50%); white-space: nowrap;
+                 color: var(--bone-dim); letter-spacing: 0.16em; }
+  .gauge__foot { position: absolute; bottom: 58px; left: 20px; writing-mode: vertical-rl; }
+
+  /* ---- the column ---- */
+  .column { max-width: 640px; margin: 0 auto; padding: 22vh 32px 34vh; }
+
+  .part { font-family: var(--mono); font-size: 10px; letter-spacing: 0.42em; text-transform: uppercase;
+          color: var(--silt); margin-bottom: 14px; }
+  .title { font-family: var(--display); font-weight: 300; font-size: clamp(40px, 6.4vw, 72px);
+           line-height: 0.98; letter-spacing: -0.012em; color: var(--bone); margin-bottom: 4vh; }
+  .rule { height: 1px; width: 100%; background: linear-gradient(90deg, var(--silt-dim), transparent);
+          margin-bottom: 12vh; }
+
+  p { margin-bottom: 1.55em; }
+  .lede { font-size: 21px; }
+  .short { margin-bottom: 2.6em; }
+  em, i { font-style: italic; }
+
+  /* ---- the refrain: still the only thing moving sideways ---- */
+  .refrain {
+    position: relative; font-family: var(--display); font-style: italic; font-weight: 300;
+    font-size: 25px; line-height: 1.3; color: var(--silt);
+    margin: 4.4em 0; white-space: nowrap; will-change: transform;
+  }
+  .refrain::before {
+    content: ""; position: absolute; left: -100vw; right: calc(100% + 22px); top: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,138,111,0.42));
+  }
+  .refrain::after {
+    content: ""; position: absolute; left: calc(100% + 22px); right: -100vw; top: 50%; height: 1px;
+    background: linear-gradient(90deg, rgba(124,138,111,0.42), transparent);
+  }
+
+  /* ---- the still passages ---- */
+  .still { color: var(--still); border-left: 1px solid var(--silt-dim); padding-left: 26px; margin: 3.4em 0; }
+  .still p { margin-bottom: 1.35em; }
+  .still p:last-child { margin-bottom: 0; }
+  .still .name { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.34em; text-transform: uppercase;
+                 color: var(--iron); display: block; margin-bottom: 1.1em; }
+
+  /* ==================================================================
+     NEW IN PART II — THE CHORUS FACES UPSTREAM.
+
+     They stand in the current and look upstream. Their words are
+     turned away from you while you move down the page. They become
+     legible only while you are moving back up, against the current.
+     Most readers will never see them. That is the sentence.
+     ================================================================== */
+  .chorus { margin: 5em 0; }
+
+  .chorus__hint {
+    font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.34em; text-transform: uppercase;
+    color: var(--silt-dim); margin-bottom: 2.4em;
+    transition: color 900ms ease;
+  }
+  body.upstream .chorus__hint { color: var(--silt); }
+
+  .voice { margin-bottom: 2.1em; }
+  .voice .who { color: var(--bone-dim); }
+
+  .voice .said {
+    display: inline-block;
+    font-style: italic;
+    color: var(--iron);
+    opacity: 0.20;
+    transform: scaleX(-1);
+    transition: transform 1100ms cubic-bezier(0.16,1,0.3,1),
+                opacity 1100ms ease,
+                color 1100ms ease;
+    will-change: transform;
+  }
+  body.upstream .voice .said {
+    transform: scaleX(1);
+    opacity: 1;
+    color: var(--still);
+  }
+
+  .questions { margin: 3.6em 0; }
+  .questions span {
+    display: inline-block; margin-right: 0.9em; font-style: italic;
+    color: var(--iron); opacity: 0.20; transform: scaleX(-1);
+    transition: transform 1100ms cubic-bezier(0.16,1,0.3,1), opacity 1100ms ease, color 1100ms ease;
+  }
+  body.upstream .questions span { transform: scaleX(1); opacity: 1; color: var(--still); }
+  .questions span:nth-child(2) { transition-delay: 90ms; }
+  .questions span:nth-child(3) { transition-delay: 180ms; }
+  .questions span:nth-child(4) { transition-delay: 270ms; }
+
+  /* ==================================================================
+     NEW IN PART II — THE SECOND GRAVE.
+     The words fall on them. They land, they pile, they dim.
+     ================================================================== */
+  .grave { position: relative; height: 260px; margin: 4.2em 0 5em; }
+  .grave b {
+    position: absolute; top: 0;
+    font-family: var(--display); font-weight: 300; font-style: italic;
+    white-space: nowrap; color: var(--bone-dim);
+    opacity: 0; transform: translateY(-70px);
+  }
+  .grave.up b { animation: bury 1.5s cubic-bezier(0.55,0,0.9,0.4) forwards; }
+  @keyframes bury {
+    0%   { opacity: 0;    transform: translateY(-70px) rotate(0deg); }
+    18%  { opacity: 0.85; }
+    100% { opacity: var(--rest); transform: translateY(var(--land)) rotate(var(--tilt)); }
+  }
+  .grave b:nth-child(2) { animation-delay: 0.22s; }
+  .grave b:nth-child(3) { animation-delay: 0.44s; }
+  .grave b:nth-child(4) { animation-delay: 0.66s; }
+  .grave b:nth-child(5) { animation-delay: 0.88s; }
+  .grave b:nth-child(6) { animation-delay: 1.10s; }
+
+  .end { margin-top: 16vh; font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.34em;
+         text-transform: uppercase; color: var(--iron); }
+
+  /* ---- entrance ---- */
+  .rise { opacity: 0; transform: translateY(14px); }
+  .rise.up { animation: rise 1.5s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  .refrain.rise { transform: translateX(-26px); }
+  .refrain.rise.up {
+    animation: sweep 2.6s cubic-bezier(0.16,1,0.3,1) forwards,
+               drift 26s ease-in-out 2.6s infinite;
+  }
+  @keyframes sweep { to { opacity: 1; transform: none; } }
+  @keyframes drift { 0%,100% { transform: translateX(0); } 50% { transform: translateX(16px); } }
+
+  /* the grave block must not inherit the rise transform */
+  .grave.rise { transform: none; }
+
+  /* ---- quality floor ---- */
+  @media (prefers-reduced-motion: reduce) {
+    main { filter: none !important; opacity: 1 !important; }
+    #silt, .haze { display: none; }
+    .rise, .refrain.rise { opacity: 1 !important; transform: none !important; animation: none !important; }
+    .voice .said, .questions span { transform: none !important; opacity: 1 !important; color: var(--still) !important; }
+    .grave b { opacity: var(--rest) !important; transform: translateY(var(--land)) rotate(var(--tilt)) !important; animation: none !important; }
+  }
+
+  @media (max-width: 860px) { .gauge { display: none; } }
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+    .column { padding: 14vh 22px 24vh; }
+    .refrain { font-size: 21px; white-space: normal; }
+    .refrain::before, .refrain::after { display: none; }
+    .still { padding-left: 18px; }
+    .grave { height: 320px; }
+    .grave b { font-size: 26px !important; left: 0 !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="silt"></canvas>
+<div class="haze"></div>
+
+<aside class="gauge" aria-hidden="true">
+  <div class="gauge__head">Upstream</div>
+  <div class="gauge__rail"></div>
+  <div class="gauge__strata" id="strata"></div>
+  <div class="gauge__mark" id="mark"></div>
+  <div class="gauge__read" id="read">0.00 · surface</div>
+  <div class="gauge__foot">Source</div>
+</aside>
+
+<main>
+  <article class="column">
+
+    <div class="part rise">Part II</div>
+    <h1 class="title rise">The Dead Speak Forward</h1>
+    <div class="rule rise"></div>
+
+    <p class="lede rise">There are voices in this country that never learned how to stop speaking. They speak through bones. Through monuments. Through soil that refuses to forget what it swallowed.</p>
+
+    <p class="rise">We built a nation on graves and then taught ourselves not to listen to them speak.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">Imagine the dead standing in the current. As witnesses.</p>
+
+    <p class="rise">Men who never came home from the surf. Women who never came home from the march. Children who never came home from the fields. Immigrants who never came home from the crossing.</p>
+
+    <p class="short rise">They stand in the river and look upstream.</p>
+
+    <p class="rise">They are not asking who you voted for. They are asking what you added.</p>
+
+    <p class="rise">I think of the men at Normandy. Not the speeches. Not the black-and-white film that makes it feel tidy.</p>
+
+    <p class="rise">I think of saltwater in lungs. Of sand between teeth. Of fear so thick it erased speech.</p>
+
+    <p class="rise">They stepped into a current they did not fully understand. They stepped forward because someone had to step forward.</p>
+
+    <p class="rise">They believed the future could be bought with their bodies.</p>
+
+    <p class="short rise">They believed a man could become a bridge.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="short rise">I think of Selma.</p>
+
+    <p class="rise">I think of feet on pavement. Of broken bones. Of tear gas blooming like poisonous flowers. Of a nation watching itself on television and deciding whether it would recognize what it saw.</p>
+
+    <p class="rise">Those marchers knew the river would not change unless they stepped into it. They knew silence was a dam. They knew speech was a flood.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">I think of the unnamed. The factory workers whose lungs filled with dust. The farmworkers whose hands bled into soil that did not remember them. The railroad builders buried where they fell. The coal miners swallowed by hell.</p>
+
+    <p class="short rise">They did not write speeches.</p>
+
+    <p class="short rise">They became sediment.</p>
+
+    <p class="rise">And still, the river remembers them.</p>
+
+    <p class="rise">Renee Goode and Alex Pretti are not anomalies. They are tributaries joining an old current.</p>
+
+    <p class="rise">You can see the pattern if you stand far enough back. Power pushes. People resist. People kneel. People say they are not angry. People die.</p>
+
+    <p class="rise">Then the words come to sand their identities smooth.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">The dead are never silent. But they are terribly inconvenient.</p>
+
+    <p class="rise">They ask questions no administration wants to answer. They ask questions no party wants to bear. They ask questions that fracture the illusion that everything is under control.</p>
+
+    <p class="short rise">So we drown them again with words.</p>
+
+    <div class="grave rise">
+      <b style="font-size:44px; --land:22px;  --tilt:-1.5deg; --rest:0.75; left:0;">Terrorist.</b>
+      <b style="font-size:38px; --land:64px;  --tilt:1.2deg;  --rest:0.62; left:118px;">Insurrectionist.</b>
+      <b style="font-size:34px; --land:104px; --tilt:-0.8deg; --rest:0.5;  left:36px;">Assassin.</b>
+      <b style="font-size:30px; --land:140px; --tilt:1.6deg;  --rest:0.4;  left:214px;">Collateral.</b>
+      <b style="font-size:26px; --land:172px; --tilt:-1.1deg; --rest:0.3;  left:74px;">Unfortunate.</b>
+      <b style="font-size:22px; --land:200px; --tilt:0.6deg;  --rest:0.22; left:290px;">Necessary.</b>
+    </div>
+
+    <p class="short rise">We build a second grave in language.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">There is a line of American dead that stretches backward before the eye can see. You can trace it though if you know how to look.</p>
+
+    <p class="rise">You can trace it from the bodies in the Atlantic surf to the bodies in the Mississippi fields to the bodies under the freeway overpasses to the bodies on grainy body cam footage.</p>
+
+    <p class="short rise">Different uniforms. Different excuses. Same current.</p>
+
+    <p class="rise">If the dead could speak, they would not argue policy. They would not debate tariffs or infrastructure or tax codes.</p>
+
+    <p class="rise">They would ask simpler questions.</p>
+
+    <div class="questions rise">
+      <span>Why were you so quiet?</span>
+      <span>Why did you laugh?</span>
+      <span>Why did you scroll past?</span>
+      <span>Why did you think someone else would fix it?</span>
+    </div>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="short rise">I imagine a chorus.</p>
+
+    <div class="chorus rise">
+      <div class="chorus__hint">They are facing upstream · read against the current</div>
+
+      <p class="voice"><span class="who">A soldier with sand in unseeing eyes,</span> <span class="said">We died so killing would not be easy.</span></p>
+      <p class="voice"><span class="who">A marcher with a fractured skull saying,</span> <span class="said">We bled so law would be blind.</span></p>
+      <p class="voice"><span class="who">A farmworker with hands like bark saying,</span> <span class="said">We labored so dignity would be more than a word.</span></p>
+      <p class="voice"><span class="who">A nurse on her knees saying,</span> <span class="said">I believed the story. Why didn’t the story believe in me?</span></p>
+      <p class="voice"><span class="who">A woman in a car saying,</span> <span class="said">I wasn’t mad at you.</span></p>
+    </div>
+
+    <p class="short rise">They stand in the current and look upstream.</p>
+
+    <p class="short rise">They look at you.</p>
+
+    <p class="rise">We like to believe history is progress. That the river moves inevitably toward justice. This is a myth we tell children and ourselves.</p>
+
+    <p class="rise">Rivers flood. Rivers dry up. Rivers are dammed. Rivers are poisoned.</p>
+
+    <p class="short rise">Justice is not downstream. Justice is upstream work.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">There is something obscene about how we sanitize the dead. We turn them into bullet points. Into curriculum. They are inspirational quotes on posters.</p>
+
+    <p class="rise">We erase the blood and the confusion and the normal day that preceded the obituary.</p>
+
+    <div class="still">
+      <span class="name">Renee Goode · Alex Pretti</span>
+      <p>Renee Goode did not wake up planning to be history. Alex Pretti did not wake up planning to kneel in a national conversation.</p>
+      <p>They woke up as people. They became currents.</p>
+    </div>
+
+    <p class="rise">I keep returning to that kneeling.</p>
+
+    <p class="rise">Kneeling is a religious posture. A submissive posture. A pleading posture. A posture of prayer.</p>
+
+    <div class="still">
+      <span class="name">The gestures</span>
+      <p>Alex Pretti knelt before the state.</p>
+      <p>Renee Goode spoke with the language of peace.</p>
+      <p>These are not threatening gestures. They are human gestures. They are the gestures of people who believe in rules, who believe in stories, who believe that civility matters.</p>
+    </div>
+
+    <p class="short rise">And yet the river did not pause.</p>
+
+    <p class="rise">America is a nation that worships action movies and distrusts stillness. We are trained to see motion as threat. To see resistance as attack. To see presence as aggression.</p>
+
+    <p class="rise">A kneeling man is a suspect. A filming citizen is a target. A woman turning a steering wheel is a weapon.</p>
+
+    <p class="rise">We have turned fear into policy and policy into reflex.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">The dead learn a brutal lesson we refuse. Systems do not need intent to kill. They need momentum.</p>
+
+    <p class="rise">Momentum is built by language, habit, doctrine, training, repetition, reward.</p>
+
+    <p class="rise">A system can kill while everyone inside it insists they are simply doing their job.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">The soldiers at Normandy were trained to run forward. The marchers at Selma were trained to keep walking. The farmworkers were trained to keep bowing. The nurses are trained to keep caring.</p>
+
+    <p class="short rise">Training is upstream.</p>
+
+    <p class="rise">We train each other with memes and talk radio and sermons and comments sections.</p>
+
+    <p class="short rise">We train ourselves into cruelty.</p>
+
+    <p class="rise">Imagine if the dead could vote on your words. Imagine if they could annotate your timeline. Imagine if they could sit beside you while you scroll and ask,</p>
+
+    <div class="questions rise">
+      <span>Is this what we died for?</span>
+    </div>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">I do not want to make saints of the dead. The dead were human. They were wrong. They were petty. They were loving. They were tired.</p>
+
+    <p class="rise">And that, precisely, is what makes their deaths unbearable.</p>
+
+    <p class="short rise">They were like you. And me.</p>
+
+    <p class="rise">When you dehumanize the dead, you are dehumanizing the living. When you mock the kneeling, you practice for mocking the vulnerable. When you celebrate killing, you practice for tolerating more killing.</p>
+
+    <p class="short rise">Practice is upstream.</p>
+
+    <p class="rise">There is a theology in the American river that predates Christianity. It was born far before the Constitution. It is ancient beyond any sermon.</p>
+
+    <p class="rise">It is the theology of conquest. Of manifest destiny. Of movement as morality.</p>
+
+    <p class="rise">We moved west. We moved bodies. We moved borders. We moved goalposts.</p>
+
+    <p class="short rise">Movement became virtue.</p>
+
+    <p class="rise">And anyone who stood still was an obstacle.</p>
+
+    <p class="rise">In this theology, resistance is sin. Observation is interference. Kneeling is defiance. Peace is provocation.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">The men who died for this country believed in a different theology. They believed in restraint. In discipline. In rules of engagement that mattered.</p>
+
+    <p class="rise">They believed power was sacred precisely because power could destroy.</p>
+
+    <p class="rise">They believed a nation worth dying for was one that made killing hard.</p>
+
+    <p class="short rise">What have we done with that belief?</p>
+
+    <p class="rise">We have made killing easy. We have made killing viral. We have made killing content.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">Christianity, too, bore a theology of reversal. The last shall be first. The meek shall inherit. Blessed are the peacemakers.</p>
+
+    <p class="rise">We have inverted it again. They celebrate the loudest. They crown the cruelest. And their platform the most incendiary.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">I want you to imagine the dead standing shoulder to shoulder in the current. Not accusing. Not forgiving. Simply watching.</p>
+
+    <p class="rise">They see your posts. They hear your jokes. And most clearly, they hear your silence.</p>
+
+    <p class="short rise">They do not care about your excuses.</p>
+
+    <p class="rise">If history is a river, then you are not a passenger on a ferry. You too are tributary.</p>
+
+    <p class="rise">You are the creek that joins the current. You are the rainfall that swells it. You are the drought that weakens it.</p>
+
+    <p class="short rise">You are not small.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">We have been taught to think of legacy as inheritance. Money. Property. Stories.</p>
+
+    <p class="short rise">Legacy is water.</p>
+
+    <p class="rise">Your children will drink from what you pour. They will swim in what you believe. They will inherit what you dissolve into the stream.</p>
+
+    <p class="rise">The dead are upstream too. They are upstream in memory. In law. In precedent. In cautionary tale.</p>
+
+    <p class="rise">They pour warnings into the current.</p>
+
+    <p class="short rise">We pour noise.</p>
+
+    <div class="still">
+      <span class="name">That sentence</span>
+      <p>Renee Goode said she was not mad. That sentence deserves to be carved into stone.</p>
+      <p>It is a confession of faith in the story of civility. It is an act of grace in a moment that did not deserve grace. It is a reminder that humanity often meets power with gentleness.</p>
+      <p>Power rarely returns the favor.</p>
+    </div>
+
+    <div class="still">
+      <span class="name">That kneel</span>
+      <p>Alex Pretti knelt. That kneel is a mirror held up to a nation that claims to value humility and restraint and law.</p>
+      <p>What does it mean when humility is met with bullets?</p>
+      <p>What does it mean when kneeling is met with applause?</p>
+    </div>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">The dead are upstream of your conscience. They ask what you are pouring.</p>
+
+    <p class="rise">Are you pouring contempt? Are you pouring cynicism? Are you pouring despair? Are you pouring humor as your anesthesia?</p>
+
+    <p class="rise">Or are you pouring resistance, clarity, love that refuses to be quiet?</p>
+
+    <p class="rise">We are a nation that loves origin stories. Pilgrims. Founders. Frontier.</p>
+
+    <p class="rise">The origin story never ends. Every generation is a source.</p>
+
+    <p class="short rise">You are a source.</p>
+
+    <p class="rise">I want you to feel the force of that. Not as guilt. As awe.</p>
+
+    <p class="short rise" style="font-size:28px; font-family:var(--display); font-style:italic; color:var(--bone);">You are water.</p>
+
+    <div class="end rise">End of Part II</div>
+
+  </article>
+</main>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+
+  /* ---------- entrance ---------- */
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('up'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+  /* ---------- gauge ---------- */
+  const strata = document.getElementById('strata');
+  const mark   = document.getElementById('mark');
+  const read   = document.getElementById('read');
+  if (strata) {
+    for (let i = 0; i <= 40; i++) {
+      const t = document.createElement('i');
+      t.style.top = (i * 2.5) + '%';
+      if (i % 5 === 0) t.className = 'major';
+      strata.appendChild(t);
+    }
+  }
+
+  /* ---------- silt ---------- */
+  const cv = document.getElementById('silt');
+  const ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+  let W = 0, H = 0;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const grains = [];
+
+  function size() {
+    W = innerWidth; H = innerHeight;
+    if (!cv) return;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size();
+  addEventListener('resize', size);
+
+  for (let i = 0; i < 220; i++) {
+    grains.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.7 + 0.4,
+      vy: Math.random() * 0.10 + 0.02,
+      vx: (Math.random() - 0.5) * 0.05,
+      a: Math.random() * 0.5 + 0.15,
+      ph: Math.random() * Math.PI * 2
+    });
+  }
+
+  /* ---------- scroll physics ----------
+     Murk clouds fast and settles slow.
+     Direction: while you move upstream, the dead turn to face you. */
+  let lastY = scrollY, vel = 0, murk = 0, upTimer = null;
+
+  function frame() {
+    requestAnimationFrame(frame);
+
+    const y = scrollY;
+    const raw = y - lastY;
+    const dy = Math.abs(raw);
+    lastY = y;
+
+    if (raw < -1.2) {
+      document.body.classList.add('upstream');
+      clearTimeout(upTimer);
+      upTimer = setTimeout(() => document.body.classList.remove('upstream'), 900);
+    }
+
+    vel += (dy - vel) * 0.35;
+    const target = Math.min(vel / 14, 1);
+    const k = target > murk ? 0.22 : 0.014;
+    murk += (target - murk) * k;
+    if (murk < 0.0008) murk = 0;
+    root.style.setProperty('--murk', murk.toFixed(4));
+
+    const max = Math.max(1, document.body.scrollHeight - innerHeight);
+    const p = Math.min(y / max, 1);
+    if (mark && read) {
+      const railTop = 96, railH = innerHeight - 192;
+      const top = railTop + railH * (1 - p);
+      mark.style.top = top + 'px';
+      read.style.top = top + 'px';
+      read.textContent = p.toFixed(2) + (p > 0.985 ? ' · source' : p < 0.01 ? ' · surface' : ' · upstream');
+    }
+
+    if (ctx) {
+      ctx.clearRect(0, 0, W, H);
+      if (murk < 0.006) return;
+      const density = 0.35 + murk * 0.65;
+      for (const g of grains) {
+        g.ph += 0.01;
+        g.y += g.vy * 0.0016 + murk * 0.0022;
+        g.x += (g.vx + Math.sin(g.ph) * 0.25) * 0.0008;
+        if (g.y > 1.02) { g.y = -0.02; g.x = Math.random(); }
+        if (g.x > 1.02) g.x = -0.02;
+        if (g.x < -0.02) g.x = 1.02;
+        ctx.beginPath();
+        ctx.arc(g.x * W, g.y * H, g.r * (0.6 + murk * 0.9), 0, 6.2832);
+        ctx.fillStyle = 'rgba(124,138,111,' + (g.a * density * murk).toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+  }
+
+  if (!reduce) frame();
+  else document.querySelectorAll('.rise').forEach(el => el.classList.add('up'));
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Thoughts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root { --said: 0; }   /* how much of it is being said right now */
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background:#1a1a18; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:40px 20px;
+  }
+
+  .page {
+    width:660px; height:880px; background:#07080a;
+    box-shadow:0 8px 60px rgba(0,0,0,.6);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-family:'Cormorant Garamond',serif; font-weight:300; text-align:center;
+    padding:0 70px;
+    position:relative; overflow:hidden;
+    cursor:default;
+    user-select:none;
+  }
+  .page::after {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:30;
+    background: radial-gradient(125% 82% at 50% 50%, transparent 50%, rgba(0,0,0,0.55) 100%);
+  }
+
+  /* ==============================================================
+     THE FRAME. One word in it is under attack from the sentence
+     it belongs to.
+     ============================================================== */
+  .frame { font-size:25px; line-height:1.55; color:#b8b1a3; position:relative; z-index:2; }
+  .frame .erase {
+    animation: selferase 7.5s cubic-bezier(0.5,0,0.75,0.2) infinite;
+  }
+  @keyframes selferase {
+    0%, 44%  { color:#b8b1a3; text-decoration-color: transparent; }
+    62%      { color:#4a463f; }
+    78%      { color:#211f1b; }
+    88%      { color:#0b0c0e; }
+    100%     { color:#b8b1a3; }
+  }
+
+  .gap { height:40px; }
+  .gap-sm { height:20px; }
+  .gap-lg { height:64px; }
+
+  /* the things that could safely be kept */
+  .kept {
+    font-family:'Courier Prime',monospace; font-size:13px; letter-spacing:.06em;
+    color:#605a50; line-height:2; position:relative; z-index:2;
+  }
+
+  .label { font-size:22px; color:#8f887b; position:relative; z-index:2; }
+
+  /* ==============================================================
+     THE THOUGHTS. They will not stay on the page. They erase
+     themselves from the end backward, over and over, and the only
+     way to hold one still is to hold it.
+     ============================================================== */
+  .think {
+    font-size:17px; line-height:2; color:#46423b; font-style:italic;
+    position:relative; z-index:2;
+  }
+  .w {
+    display:inline-block;
+    color:#6a655c;
+    text-decoration: line-through;
+    text-decoration-color: transparent;
+    transition: color .85s ease, text-decoration-color .85s ease, opacity .85s ease, filter .85s ease;
+  }
+  .w.dim    { color:#3a3730; }
+  .w.struck { color:#26241f; text-decoration-color:#211f1b; }
+  .w.gone   { color:#0e0f11; text-decoration-color:transparent; filter: blur(0.6px); }
+
+  /* held. said. */
+  .w.said {
+    color:#b8b1a3 !important;
+    text-decoration-color: transparent !important;
+    filter:none !important;
+    transition: color .12s ease, text-decoration-color .12s ease, filter .12s ease;
+  }
+
+  .those { font-size:18px; color:#544f47; position:relative; z-index:2; }
+
+  /* ==============================================================
+     THE VERDICT.
+     'saint' sinks into the page, and keeps sinking, and never
+     finishes sinking. It is the cost of the erasing.
+     'monster' does not move, does not dim, and gets brighter the
+     more of it you say out loud.
+     ============================================================== */
+  .saint {
+    font-size:24px; color:#322f2a; line-height:1.5; position:relative; z-index:2;
+    animation: sink 9s ease-in-out infinite;
+  }
+  .saint .deep { color:#1b1c1e; }
+  @keyframes sink {
+    0%,100% { opacity:1;    transform: translateY(0); }
+    55%     { opacity:0.18; transform: translateY(3px); }
+  }
+  /* the more you say, the further he goes under */
+  .page.holding .saint { animation: none; opacity: calc(0.9 - var(--said) * 0.78); transform: translateY(calc(var(--said) * 4px)); transition: opacity .3s ease, transform .3s ease; }
+
+  .monster {
+    font-size:26px; color:#ece6d6; line-height:1.5; position:relative; z-index:2;
+    transition: text-shadow .3s ease;
+  }
+  .monster .word {
+    color:#ffffff;
+    text-shadow: 0 0 calc(var(--said) * 26px) rgba(255,255,255, calc(var(--said) * 0.5));
+    transition: text-shadow .3s ease;
+  }
+
+  /* ==============================================================
+     the instruction, offered quietly, once you have watched them go
+     ============================================================== */
+  .hint {
+    position:absolute; bottom:38px; left:0; right:0; z-index:5;
+    font-family:'Courier Prime',monospace; font-size:9px;
+    letter-spacing:.34em; text-transform:uppercase; color:#3d3a34;
+    pointer-events:none;
+    opacity:0;
+    animation: offer 13s ease-in-out 5s infinite;
+  }
+  @keyframes offer {
+    0%, 12%, 88%, 100% { opacity:0; }
+    38%, 62%           { opacity:0.85; }
+  }
+  .page.holding .hint { animation:none; opacity:0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation:none !important; transition:none !important; }
+    .hint { opacity:0.7; }
+  }
+  @media (max-width: 720px) {
+    body { padding:14px 8px; }
+    .page { width:100%; max-width:660px; height:auto; aspect-ratio:660/880; padding:0 34px; }
+    .frame { font-size:20px; }
+    .think { font-size:14px; }
+    .saint { font-size:19px; }
+    .monster { font-size:21px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page" id="page">
+
+  <div class="frame">the honest record of me<br>is the one I'd <span class="erase">erase</span> first.</div>
+
+  <div class="gap"></div>
+  <div class="kept">not the letters.</div>
+  <div class="kept">not the journals.</div>
+
+  <div class="gap"></div>
+  <div class="label">the thoughts.</div>
+
+  <div class="gap-sm"></div>
+  <div class="think" data-line="I imagined someone else."></div>
+  <div class="think" data-line="I was relieved when it ended."></div>
+  <div class="think" data-line="I counted what I would get."></div>
+
+  <div class="gap-sm"></div>
+  <div class="those">those are the man.</div>
+
+  <div class="gap-lg"></div>
+  <div class="saint">erase them, <span class="deep">I'm a saint.</span></div>
+  <div class="gap-sm"></div>
+  <div class="monster">say them, I'm a <span class="word">monster.</span></div>
+
+  <div class="hint">press and hold</div>
+</div>
+
+<script>
+(function () {
+  const page = document.getElementById('page');
+  const root = document.documentElement;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- build the thoughts word by word ---- */
+  const lines = [];
+  document.querySelectorAll('.think').forEach((el, li) => {
+    const words = el.dataset.line.split(' ');
+    const spans = words.map(w => {
+      const s = document.createElement('span');
+      s.className = 'w';
+      s.textContent = w;
+      el.appendChild(s);
+      el.appendChild(document.createTextNode(' '));
+      return s;
+    });
+    lines.push({ el, spans, front: spans.length, phase: 'erasing', t: li * 3 });
+  });
+
+  const total = lines.reduce((n, l) => n + l.spans.length, 0);
+
+  if (reduce) {
+    /* leave them where the poem left them: caught mid-erasure */
+    lines.forEach(l => {
+      const n = l.spans.length;
+      l.spans.forEach((s, i) => {
+        if (i >= n - 1) s.classList.add('gone');
+        else if (i >= n - 2) s.classList.add('struck');
+        else if (i >= n - 3) s.classList.add('dim');
+      });
+    });
+    return;
+  }
+
+  /* ---- erasure. from the end backward. it never finishes, and it
+         never stops trying. ---- */
+  function paint(l) {
+    l.spans.forEach((s, i) => {
+      s.classList.remove('dim', 'struck', 'gone');
+      const d = i - l.front;          /* how far past the erasing front */
+      if (d >= 2)      s.classList.add('gone');
+      else if (d >= 1) s.classList.add('struck');
+      else if (d >= 0) s.classList.add('dim');
+    });
+  }
+  lines.forEach(paint);
+
+  let holding = false;
+
+  setInterval(() => {
+    if (holding) return;
+    for (const l of lines) {
+      l.t++;
+      if (l.phase === 'erasing') {
+        if (l.t % 2) continue;
+        l.front--;
+        paint(l);
+        if (l.front < -2) { l.phase = 'blank'; l.t = 0; }
+      } else if (l.phase === 'blank') {
+        if (l.t > 5) { l.front = l.spans.length; paint(l); l.phase = 'whole'; l.t = 0; }
+      } else if (l.phase === 'whole') {
+        if (l.t > 6) { l.phase = 'erasing'; l.t = 0; }
+      }
+    }
+  }, 300);
+
+  /* ---- hold them still. saying them costs him the sainthood and
+         lights the only white word on the page. ---- */
+  let said = 0, target = 0;
+
+  function down() {
+    holding = true;
+    target = 1;
+    page.classList.add('holding');
+    lines.forEach(l => l.spans.forEach(s => s.classList.add('said')));
+  }
+  function up() {
+    holding = false;
+    target = 0;
+    page.classList.remove('holding');
+    lines.forEach(l => l.spans.forEach(s => s.classList.remove('said')));
+    /* and immediately he starts taking them back */
+    lines.forEach(l => { l.phase = 'erasing'; l.t = 0; l.front = l.spans.length; paint(l); });
+  }
+
+  page.addEventListener('pointerdown', e => { e.preventDefault(); down(); });
+  addEventListener('pointerup', up);
+  addEventListener('pointercancel', up);
+  addEventListener('blur', up);
+  addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); down(); } });
+  addEventListener('keyup',   e => { if (e.code === 'Space') up(); });
+
+  (function tick() {
+    requestAnimationFrame(tick);
+    said += (target - said) * (target > said ? 0.09 : 0.05);
+    root.style.setProperty('--said', said.toFixed(4));
+  })();
+})();
+</script>
+
+</body>
+</html>

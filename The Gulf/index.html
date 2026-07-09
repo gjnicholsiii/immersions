@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gulf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background:#1a1a18; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:40px 20px;
+  }
+
+  .page {
+    width:660px; height:880px; background:#07080a;
+    box-shadow:0 8px 60px rgba(0,0,0,.6);
+    position:relative; overflow:hidden;
+    cursor: crosshair;
+  }
+  .page::after {
+    content:""; position:absolute; inset:0; pointer-events:none; z-index:40;
+    background: radial-gradient(130% 78% at 50% 51%, transparent 54%, rgba(0,0,0,0.52) 100%);
+  }
+
+  span { position:absolute; white-space:nowrap; line-height:1; }
+
+  /* ==========================================================
+     THE SIGHTLINE. It runs from one to the other. It is never
+     interrupted by anything but words.
+     ========================================================== */
+  .sight {
+    position:absolute; z-index:1; pointer-events:none;
+    left:62px; right:62px; top:481px; height:1px;
+    background: linear-gradient(90deg,
+      rgba(171,42,30,0.30), rgba(171,42,30,0.05) 26%,
+      rgba(171,42,30,0.03) 74%, rgba(171,42,30,0.30));
+    animation: sight 11s ease-in-out infinite;
+  }
+  @keyframes sight {
+    0%,100% { opacity: 0.30; }
+    50%     { opacity: 0.62; }
+  }
+
+  /* ==========================================================
+     I. YOU.
+     Same size. Same colour. Same height on the page.
+     Two hearts, two different rates. They pass in and out of
+     phase for as long as the page is open and never once beat
+     together.
+     ========================================================== */
+  .anchor { z-index:20; will-change: opacity, transform; }
+  #A_I   { animation: beatA 5.2s ease-in-out infinite; transform-origin: left center; }
+  #A_you { animation: beatB 5.9s ease-in-out infinite; transform-origin: right center; }
+  @keyframes beatA {
+    0%,100% { opacity: 0.72; transform: scale(1); }
+    42%     { opacity: 1;    transform: scale(1.014); }
+  }
+  @keyframes beatB {
+    0%,100% { opacity: 0.72; transform: scale(1); }
+    42%     { opacity: 1;    transform: scale(1.014); }
+  }
+
+  /* ==========================================================
+     THE FIELD. The same twenty thoughts, thought again.
+     A pulse of attention moves through them in reading order,
+     lights each one for a moment, and starts over. Forever.
+     ========================================================== */
+  .frag {
+    z-index:10;
+    will-change: transform, opacity, color;
+    transition: color .5s ease, opacity .5s ease, text-shadow .5s ease;
+  }
+  .frag.lit {
+    color:#c9c3b6 !important;
+    opacity:1 !important;
+    text-shadow: 0 0 12px rgba(201,195,182,0.22);
+    transition: color .09s ease, opacity .09s ease, text-shadow .09s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .frag.lit { color: inherit !important; text-shadow: none; }
+  }
+  @media (max-width: 720px) {
+    body { padding:14px 8px; }
+    .page { width:100%; max-width:660px; height:auto; aspect-ratio:660/880; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page" id="page">
+  <div class="stage" id="stage" style="position:absolute; inset:0;">
+    <div class="sight"></div>
+  </div>
+</div>
+
+<script>
+const D = {"f":[{"t":"leave some out","top":336.2,"left":176.0,"right":null,"sz":12.5,"op":0.8,"col":"rgb(80,77,72)","w":"300","it":false,"mono":false,"r":1.1},{"t":"manage it","top":335.4,"left":268.6,"right":null,"sz":12.5,"op":0.83,"col":"rgb(82,79,74)","w":"300","it":true,"mono":false,"r":-2.0},{"t":"what love requires","top":336.9,"left":331.7,"right":null,"sz":10.4,"op":0.78,"col":"rgb(89,86,81)","w":"300","it":true,"mono":false,"r":-2.6},{"t":"change it on the way out","top":334.9,"left":431.7,"right":null,"sz":11.0,"op":0.56,"col":"rgb(90,87,82)","w":"300","it":true,"mono":false,"r":2.6},{"t":"negotiate","top":346.1,"left":176.0,"right":null,"sz":11.2,"op":0.77,"col":"rgb(105,102,97)","w":"300","it":true,"mono":false,"r":-2.7},{"t":"careful now","top":348.0,"left":234.3,"right":null,"sz":12.5,"op":0.54,"col":"rgb(82,79,74)","w":"300","it":false,"mono":false,"r":0.1},{"t":"stay pleasant","top":349.8,"left":316.5,"right":null,"sz":10.9,"op":0.54,"col":"rgb(99,96,91)","w":"300","it":false,"mono":false,"r":-2.8},{"t":"what it costs to be seen","top":347.2,"left":401.0,"right":null,"sz":10.5,"op":0.67,"col":"rgb(91,88,83)","w":"300","it":true,"mono":false,"r":1.2},{"t":"don't need her so much","top":361.0,"left":176.0,"right":null,"sz":11.0,"op":0.71,"col":"rgb(75,72,67)","w":"300","it":true,"mono":false,"r":1.3},{"t":"keep it pleasant","top":360.0,"left":298.2,"right":null,"sz":11.7,"op":0.51,"col":"rgb(95,92,87)","w":"300","it":true,"mono":false,"r":0.9},{"t":"be easy","top":363.2,"left":395.6,"right":null,"sz":12.6,"op":0.77,"col":"rgb(72,69,64)","w":"300","it":true,"mono":false,"r":0.4},{"t":"be less","top":362.6,"left":447.3,"right":null,"sz":12.4,"op":0.54,"col":"rgb(96,93,88)","w":"300","it":true,"mono":false,"r":-1.2},{"t":"be good","top":374.5,"left":176.0,"right":null,"sz":12.3,"op":0.65,"col":"rgb(103,100,95)","w":"300","it":false,"mono":false,"r":-1.3},{"t":"keep it light","top":376.5,"left":229.5,"right":null,"sz":10.6,"op":0.78,"col":"rgb(94,91,86)","w":"300","it":true,"mono":false,"r":2.2},{"t":"protect the picture of me","top":375.8,"left":304.9,"right":null,"sz":11.4,"op":0.77,"col":"rgb(102,99,94)","w":"300","it":true,"mono":false,"r":1.6},{"t":"give her what she can live with","top":374.5,"left":453.3,"right":null,"sz":11.8,"op":0.62,"col":"rgb(89,86,81)","w":"300","it":true,"mono":false,"r":1.6},{"t":"what would it require","top":386.9,"left":176.0,"right":null,"sz":12.5,"op":0.7,"col":"rgb(81,78,73)","w":"300","it":false,"mono":true,"r":-1.5},{"t":"what will she think","top":387.3,"left":313.2,"right":null,"sz":11.4,"op":0.72,"col":"rgb(102,99,94)","w":"300","it":true,"mono":false,"r":1.4},{"t":"be easy to love","top":388.7,"left":430.8,"right":null,"sz":11.1,"op":0.8,"col":"rgb(81,78,73)","w":"300","it":false,"mono":false,"r":0.1},{"t":"don't be a burden","top":399.3,"left":176.0,"right":null,"sz":12.2,"op":0.6,"col":"rgb(100,97,92)","w":"300","it":false,"mono":true,"r":-0.5},{"t":"not all of it","top":399.7,"left":287.8,"right":null,"sz":12.5,"op":0.73,"col":"rgb(103,100,95)","w":"300","it":true,"mono":false,"r":0.8},{"t":"stay likeable","top":399.6,"left":379.4,"right":null,"sz":10.4,"op":0.7,"col":"rgb(80,77,72)","w":"300","it":true,"mono":false,"r":-1.9},{"t":"what I'd have to show","top":408.6,"left":176.0,"right":null,"sz":11.1,"op":0.7,"col":"rgb(74,71,66)","w":"300","it":false,"mono":false,"r":-0.6},{"t":"keep most of it back","top":400.6,"left":458.6,"right":null,"sz":12.6,"op":0.56,"col":"rgb(84,81,76)","w":"300","it":true,"mono":false,"r":-0.1},{"t":"I can't afford that","top":411.1,"left":296.1,"right":null,"sz":11.2,"op":0.73,"col":"rgb(77,74,69)","w":"300","it":false,"mono":false,"r":-1.2},{"t":"what if she saw","top":410.4,"left":407.3,"right":null,"sz":11.5,"op":0.6,"col":"rgb(107,104,99)","w":"300","it":true,"mono":false,"r":0.4},{"t":"don't disturb her","top":423.7,"left":176.0,"right":null,"sz":10.7,"op":0.69,"col":"rgb(94,91,86)","w":"300","it":false,"mono":false,"r":-0.9},{"t":"say the safer one","top":422.5,"left":278.3,"right":null,"sz":10.3,"op":0.61,"col":"rgb(76,73,68)","w":"300","it":true,"mono":false,"r":2.3},{"t":"the part she can bear","top":422.8,"left":374.5,"right":null,"sz":11.3,"op":0.67,"col":"rgb(84,81,76)","w":"300","it":false,"mono":false,"r":2.1},{"t":"calculate","top":433.9,"left":227.5,"right":null,"sz":11.4,"op":0.72,"col":"rgb(77,74,69)","w":"300","it":true,"mono":false,"r":-2.2},{"t":"smaller than I meant","top":434.8,"left":288.6,"right":null,"sz":11.4,"op":0.59,"col":"rgb(105,102,97)","w":"300","it":false,"mono":false,"r":-1.4},{"t":"be fine","top":438.1,"left":176.0,"right":null,"sz":12.0,"op":0.67,"col":"rgb(89,86,81)","w":"300","it":true,"mono":false,"r":-0.0},{"t":"soften it","top":437.6,"left":405.1,"right":null,"sz":12.6,"op":0.67,"col":"rgb(88,85,80)","w":"300","it":true,"mono":false,"r":2.3},{"t":"not too much","top":447.6,"left":176.0,"right":null,"sz":10.6,"op":0.68,"col":"rgb(88,85,80)","w":"300","it":true,"mono":false,"r":-0.2},{"t":"don't ask for much","top":447.7,"left":248.1,"right":null,"sz":12.0,"op":0.55,"col":"rgb(107,104,99)","w":"300","it":false,"mono":true,"r":1.1},{"t":"the courteous distance","top":447.8,"left":358.6,"right":null,"sz":11.9,"op":0.5,"col":"rgb(82,79,74)","w":"300","it":true,"mono":false,"r":1.2},{"t":"she'd go if she knew","top":461.7,"left":176.0,"right":null,"sz":12.4,"op":0.66,"col":"rgb(94,91,86)","w":"300","it":false,"mono":false,"r":-0.2},{"t":"leave some out","top":461.2,"left":307.6,"right":null,"sz":11.0,"op":0.74,"col":"rgb(70,67,62)","w":"300","it":true,"mono":false,"r":2.5},{"t":"manage it","top":459.6,"left":389.9,"right":null,"sz":11.4,"op":0.8,"col":"rgb(105,102,97)","w":"300","it":true,"mono":false,"r":0.2},{"t":"what love requires","top":457.9,"left":447.6,"right":null,"sz":12.0,"op":0.78,"col":"rgb(87,84,79)","w":"300","it":true,"mono":false,"r":1.3},{"t":"negotiate","top":472.1,"left":318.6,"right":null,"sz":12.4,"op":0.74,"col":"rgb(88,85,80)","w":"300","it":true,"mono":false,"r":1.8},{"t":"careful now","top":471.5,"left":380.5,"right":null,"sz":10.8,"op":0.54,"col":"rgb(105,102,97)","w":"300","it":true,"mono":false,"r":0.5},{"t":"change it on the way out","top":474.0,"left":176.0,"right":null,"sz":11.9,"op":0.54,"col":"rgb(73,70,65)","w":"300","it":false,"mono":true,"r":1.9},{"t":"stay pleasant","top":474.3,"left":452.5,"right":null,"sz":12.3,"op":0.5,"col":"rgb(78,75,70)","w":"300","it":false,"mono":true,"r":-0.1},{"t":"what it costs to be seen","top":486.8,"left":176.0,"right":null,"sz":12.4,"op":0.74,"col":"rgb(78,75,70)","w":"300","it":false,"mono":true,"r":0.0},{"t":"don't need her so much","top":487.4,"left":332.0,"right":null,"sz":11.6,"op":0.59,"col":"rgb(84,81,76)","w":"300","it":true,"mono":false,"r":0.1},{"t":"keep it pleasant","top":484.1,"left":460.5,"right":null,"sz":10.8,"op":0.65,"col":"rgb(93,90,85)","w":"300","it":true,"mono":false,"r":-1.0},{"t":"be easy","top":497.8,"left":176.0,"right":null,"sz":12.3,"op":0.7,"col":"rgb(102,99,94)","w":"300","it":false,"mono":false,"r":-1.1},{"t":"be good","top":498.4,"left":279.1,"right":null,"sz":10.6,"op":0.78,"col":"rgb(101,98,93)","w":"300","it":false,"mono":true,"r":-0.9},{"t":"keep it light","top":497.2,"left":325.5,"right":null,"sz":11.1,"op":0.77,"col":"rgb(92,89,84)","w":"300","it":false,"mono":false,"r":-1.2},{"t":"protect the picture of me","top":498.9,"left":408.0,"right":null,"sz":12.5,"op":0.68,"col":"rgb(93,90,85)","w":"300","it":true,"mono":false,"r":-0.6},{"t":"be less","top":499.8,"left":233.5,"right":null,"sz":10.4,"op":0.52,"col":"rgb(94,91,86)","w":"300","it":false,"mono":true,"r":1.1},{"t":"give her what she can live with","top":508.7,"left":176.0,"right":null,"sz":10.8,"op":0.67,"col":"rgb(72,69,64)","w":"300","it":true,"mono":false,"r":-0.4},{"t":"what would it require","top":510.1,"left":342.5,"right":null,"sz":12.4,"op":0.61,"col":"rgb(97,94,89)","w":"300","it":true,"mono":false,"r":-2.6},{"t":"what will she think","top":521.7,"left":176.0,"right":null,"sz":11.4,"op":0.59,"col":"rgb(105,102,97)","w":"300","it":true,"mono":false,"r":-1.6},{"t":"be easy to love","top":520.5,"left":290.3,"right":null,"sz":10.4,"op":0.61,"col":"rgb(93,90,85)","w":"300","it":false,"mono":true,"r":-0.3},{"t":"don't be a burden","top":521.2,"left":380.4,"right":null,"sz":10.7,"op":0.6,"col":"rgb(90,87,82)","w":"300","it":false,"mono":false,"r":-1.8},{"t":"not all of it","top":533.2,"left":176.0,"right":null,"sz":10.5,"op":0.81,"col":"rgb(95,92,87)","w":"300","it":true,"mono":false,"r":-0.8},{"t":"keep most of it back","top":533.1,"left":338.9,"right":null,"sz":12.5,"op":0.66,"col":"rgb(70,67,62)","w":"300","it":true,"mono":false,"r":-2.8},{"t":"stay likeable","top":536.5,"left":249.3,"right":null,"sz":12.6,"op":0.56,"col":"rgb(99,96,91)","w":"300","it":true,"mono":false,"r":0.9},{"t":"what I'd have to show","top":546.0,"left":176.0,"right":null,"sz":11.6,"op":0.74,"col":"rgb(76,73,68)","w":"300","it":false,"mono":false,"r":-0.2},{"t":"I can't afford that","top":546.7,"left":304.9,"right":null,"sz":11.8,"op":0.64,"col":"rgb(101,98,93)","w":"300","it":false,"mono":true,"r":-0.6},{"t":"what if she saw","top":548.4,"left":420.9,"right":null,"sz":10.4,"op":0.82,"col":"rgb(72,69,64)","w":"300","it":true,"mono":false,"r":-1.9}],"a":[{"t":"I","top":452.0,"left":34.0,"right":null,"sz":78.0,"op":1.0,"col":"rgb(171,42,30)","w":"400","it":false,"mono":false,"r":0.0},{"t":"you","top":452.0,"left":null,"right":34.0,"sz":78.0,"op":1.0,"col":"rgb(171,42,30)","w":"400","it":false,"mono":false,"r":0.0}]};
+const page = document.getElementById('page');
+const stage = document.getElementById('stage');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const CORM = "'Cormorant Garamond',serif";
+const COUR = "'Courier Prime',monospace";
+
+/* ---- the two who never move ---- */
+for (const a of D.a) {
+  const s = document.createElement('span');
+  s.className = 'anchor';
+  s.id = 'A_' + a.t;
+  s.textContent = a.t;
+  s.style.top = a.top + 'px';
+  if (a.left != null) s.style.left = a.left + 'px';
+  if (a.right != null) s.style.right = a.right + 'px';
+  s.style.fontSize = a.sz + 'px';
+  s.style.color = a.col;
+  s.style.fontFamily = CORM;
+  s.style.fontWeight = a.w || 400;
+  stage.appendChild(s);
+}
+
+/* ---- everything he says to himself instead ---- */
+const F = [];
+D.f.forEach((f, i) => {
+  const s = document.createElement('span');
+  s.className = 'frag';
+  s.textContent = f.t;
+  s.style.top = f.top + 'px';
+  s.style.left = f.left + 'px';
+  s.style.fontSize = f.sz + 'px';
+  s.style.color = f.col;
+  s.style.opacity = f.op;
+  s.style.fontFamily = f.mono ? COUR : CORM;
+  s.style.fontWeight = f.w || 300;
+  if (f.it) s.style.fontStyle = 'italic';
+  s.style.transformOrigin = 'left center';
+  s.style.transform = 'rotate(' + f.r + 'deg)';
+  stage.appendChild(s);
+  F.push({ el: s, x: f.left, y: f.top, r: f.r, jp: Math.random() * 6.283, js: 0.5 + Math.random() * 0.7 });
+});
+
+if (!reduce) {
+
+  /* ------------------------------------------------------------
+     RUMINATION. The pulse runs the field in reading order, then
+     runs it again. The list already repeats itself twice; the
+     pulse makes you watch it happen.
+     ------------------------------------------------------------ */
+  let k = 0;
+  setInterval(() => {
+    const el = F[k % F.length].el;
+    el.classList.add('lit');
+    setTimeout(() => el.classList.remove('lit'), 620);
+    k++;
+  }, 118);
+
+  /* ------------------------------------------------------------
+     RECOIL. The fragments will not be looked at directly. Bring
+     the cursor near and they move away from it and go dim. You
+     can clear a space in the gulf. You cannot read what was there.
+     ------------------------------------------------------------ */
+  let mx = -9999, my = -9999;
+  page.addEventListener('pointermove', e => {
+    const r = page.getBoundingClientRect();
+    const k = 660 / r.width;
+    mx = (e.clientX - r.left) * k;
+    my = (e.clientY - r.top) * k;
+  });
+  page.addEventListener('pointerleave', () => { mx = my = -9999; });
+
+  const R = 96;
+  let t = 0;
+
+  (function frame() {
+    requestAnimationFrame(frame);
+    t += 0.011;
+
+    for (const f of F) {
+      /* the mind rewording itself, a fraction of a degree at a time */
+      const jitter = Math.sin(t * f.js + f.jp) * 0.32;
+
+      const dx = f.x - mx, dy = f.y - my;
+      const d = Math.hypot(dx, dy);
+
+      let px = 0, py = 0, fade = 1;
+      if (d < R) {
+        const push = (1 - d / R);
+        const inv = d < 1 ? 1 : 1 / d;
+        px = dx * inv * push * 22;
+        py = dy * inv * push * 22;
+        fade = 1 - push * 0.86;
+      }
+
+      f.el.style.transform =
+        'translate(' + px.toFixed(2) + 'px,' + py.toFixed(2) + 'px) ' +
+        'rotate(' + (f.r + jitter).toFixed(3) + 'deg)';
+      f.el.style.opacity = (f.el.classList.contains('lit') ? 1 : fade).toFixed(3);
+    }
+  })();
+}
+
+/* fit the fixed 660x880 field on narrow screens */
+function fit() {
+  const w = page.clientWidth, k = w / 660;
+  if (k < 1) {
+    stage.style.transform = 'scale(' + k + ')';
+    stage.style.transformOrigin = 'top left';
+    stage.style.width = '660px';
+    stage.style.height = '880px';
+  } else {
+    stage.style.transform = '';
+    stage.style.width = stage.style.height = '';
+  }
+}
+fit();
+addEventListener('resize', fit);
+</script>
+
+</body>
+</html>

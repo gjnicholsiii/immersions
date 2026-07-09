@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Decoy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root { --lacquer: 1; }   /* how convincing the surface still is */
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background:#0e0c0b; color:#c8bfaf;
+    font-family:'Cormorant Garamond',serif; font-weight:300;
+    min-height:100vh; padding:90px 0 170px;
+    overflow-x:hidden;
+  }
+
+  .poem { max-width:580px; margin:0 auto; padding:0 36px; position:relative; }
+
+  /* ==============================================================
+     THE LACQUER. A decoy has to be beautiful. A slow sheen crosses
+     the surface lines, the way light crosses something built to be
+     believed. Every truth you uncover takes some of the shine off.
+     ============================================================== */
+  .lacquer {
+    position:fixed; inset:0; z-index:3; pointer-events:none;
+    mix-blend-mode:overlay;
+    opacity: var(--lacquer);
+    transition: opacity 2.4s ease;
+  }
+  .lacquer i {
+    position:absolute; top:-30%; left:-45%;
+    width:32%; height:170%;
+    background: linear-gradient(102deg, transparent, rgba(255,248,228,0.10) 46%, transparent);
+    filter: blur(16px);
+    animation: sheen 17s linear infinite;
+  }
+  @keyframes sheen {
+    0%   { transform: translateX(0) skewX(-9deg); }
+    100% { transform: translateX(460%) skewX(-9deg); }
+  }
+
+  /* ==============================================================
+     THE PAIR. A surface, and what is under it.
+     ============================================================== */
+  .pair {
+    position:relative;
+    margin-bottom:46px;
+    padding-left:18px;
+  }
+  .pair.wide { margin-bottom:84px; }
+
+  /* the dwell. it fills only while you stay. */
+  .pair .stay {
+    position:absolute; left:0; top:2px; bottom:2px; width:1px;
+    background:#221f1c;
+  }
+  .pair .stay u {
+    position:absolute; left:0; top:0; width:1px; height:0;
+    text-decoration:none;
+    background:#7e8b80;
+    box-shadow:0 0 6px rgba(126,139,128,0.5);
+  }
+  .pair.done .stay u { height:100%; background:#566058; box-shadow:none; }
+  .pair.plain .stay { display:none; }
+
+  .seen {
+    display:block; font-size:21px; line-height:1.9; color:#e6dfce;
+    position:relative; z-index:2;
+  }
+
+  .true {
+    display:block; font-family:'Courier Prime',monospace; font-size:13px;
+    color:#7e8b80; line-height:1.7; letter-spacing:0.03em;
+    padding-left:110px;
+    margin-top:22px;
+    position:relative; z-index:2;
+
+    opacity:0;
+    filter: blur(5px);
+    transform: translateY(-3px);
+    transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease;
+  }
+  .pair.done .true { opacity:1; filter:blur(0); transform:none; }
+
+  .ind  { padding-left:55px; }
+  .ind2 { padding-left:110px; }
+  .faint { color:#7a736a; }
+  .tfaint { color:#566058; }
+  .small { font-size:15px; }
+  .right { text-align:right; }
+  .true.right { padding-left:0; }
+
+  /* ==============================================================
+     THE LAST LINE. If you stay for all of it — if you are the one
+     it was grown to let in — the surface stops being the surface.
+     ============================================================== */
+  .last { transition: color 3.2s ease; }
+  body.stayed .last { color:#7e8b80; }
+  body.stayed .lacquer { opacity:0; }
+
+  /* entrance */
+  .pair { opacity:0; transform:translateY(8px); transition:opacity .9s ease, transform .9s ease; }
+  .pair.in { opacity:1; transform:none; }
+  .pair.in .true { transition: opacity 1.4s ease, filter 1.4s ease, transform 1.4s ease; }
+
+  @media (prefers-reduced-motion:reduce) {
+    * { animation:none !important; }
+    .pair { opacity:1 !important; transform:none !important; }
+    .true { opacity:1 !important; filter:none !important; transform:none !important; }
+    .lacquer { display:none; }
+    .stay { display:none !important; }
+  }
+  @media (max-width:640px) {
+    body { padding:56px 0 110px; }
+    .poem { padding:0 22px; }
+    .seen { font-size:18px; }
+    .true { padding-left:44px; font-size:12px; }
+    .ind { padding-left:26px; }
+    .ind2 { padding-left:52px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lacquer"><i></i></div>
+
+<div class="poem" id="poem">
+
+  <div class="pair" data-dwell="2600">
+    <div class="stay"></div>
+    <span class="seen">they tell me I look full</span>
+    <span class="true">every leaf taken</span>
+  </div>
+
+  <div class="pair" data-dwell="3400">
+    <div class="stay"></div>
+    <span class="seen">they admire how I thrive</span>
+    <span class="true">I grew the marks myself</span>
+  </div>
+
+  <div class="pair wide" data-dwell="4400">
+    <div class="stay"></div>
+    <span class="seen">chosen. occupied. given.</span>
+    <span class="true">none of it is real</span>
+  </div>
+
+  <div class="pair" data-dwell="5600">
+    <div class="stay"></div>
+    <span class="seen">a stranger reads the surface</span>
+    <span class="seen ind">and goes</span>
+    <span class="true">good</span>
+  </div>
+
+  <div class="pair wide" data-dwell="7200">
+    <div class="stay"></div>
+    <span class="seen">nothing real gets laid in me</span>
+    <span class="true">I saw to that</span>
+  </div>
+
+  <div class="pair wide plain">
+    <div class="stay"></div>
+    <span class="seen">the false ones did their job</span>
+    <span class="seen">the real one read the same surface</span>
+    <span class="seen ind">and believed it</span>
+    <span class="seen ind2 faint small">like everyone</span>
+  </div>
+
+  <div class="pair wide" data-dwell="17000">
+    <div class="stay"></div>
+    <span class="seen right small">come anyway</span>
+    <span class="seen right small">stay until you find it false</span>
+    <span class="true right tfaint">no one stays that long</span>
+  </div>
+
+  <div class="pair plain">
+    <div class="stay"></div>
+    <span class="seen">I made it too good</span>
+    <span class="seen last">it kept out the one I grew it to let in</span>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const root = document.documentElement;
+  const pairs = Array.from(document.querySelectorAll('.pair[data-dwell]'));
+
+  /* the poem surfaces one stanza at a time */
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.25 });
+  document.querySelectorAll('.pair').forEach(p => io.observe(p));
+
+  if (reduce) { document.body.classList.add('stayed'); return; }
+
+  /* ----------------------------------------------------------------
+     STAYING.
+
+     Nothing under the surface opens because you looked at it. It
+     opens because you did not leave. The plant has been lying to
+     passers-by for a long time and it is good at it, so each
+     admission asks for longer than the one before it, and the line
+     about how long nobody stays asks for seventeen seconds.
+
+     Leave early and it closes back up faster than it opened.
+     ---------------------------------------------------------------- */
+  let found = 0;
+  const need = pairs.length;
+
+  for (const p of pairs) {
+    const rail = p.querySelector('.stay');
+    const fill = document.createElement('u');
+    rail.appendChild(fill);
+
+    const req = +p.dataset.dwell;
+    let held = 0, raf = null, last = 0, decay = null;
+
+    const paint = () => { fill.style.height = Math.min(100, held / req * 100) + '%'; };
+
+    function open(ts) {
+      if (!last) last = ts;
+      held += ts - last;
+      last = ts;
+      paint();
+
+      if (held >= req) {
+        cancelAnimationFrame(raf); raf = null;
+        p.classList.add('done');
+        found++;
+        root.style.setProperty('--lacquer', (1 - found / need).toFixed(3));
+        if (found === need) document.body.classList.add('stayed');
+        return;
+      }
+      raf = requestAnimationFrame(open);
+    }
+
+    function stay() {
+      if (p.classList.contains('done')) return;
+      clearInterval(decay); decay = null;
+      last = 0;
+      if (!raf) raf = requestAnimationFrame(open);
+    }
+
+    function go() {
+      if (p.classList.contains('done')) return;
+      cancelAnimationFrame(raf); raf = null; last = 0;
+      clearInterval(decay);
+      decay = setInterval(() => {
+        held -= 70;
+        if (held <= 0) { held = 0; clearInterval(decay); decay = null; }
+        paint();
+      }, 16);
+    }
+
+    p.addEventListener('pointerenter', stay);
+    p.addEventListener('pointerdown', stay);
+    p.addEventListener('pointerleave', go);
+    p.addEventListener('pointerup', go);
+    p.addEventListener('pointercancel', go);
+  }
+})();
+</script>
+
+</body>
+</html>

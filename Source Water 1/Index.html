@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Source Water — Part I</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground:  #0d0f0e;
+    --ground-2:#141715;
+    --bone:    #d8d3c6;
+    --bone-dim:#9a958a;
+    --iron:    #6d7370;
+    --silt:    #7c8a6f;
+    --silt-dim:#4a5344;
+    --still:   #efe9da;
+
+    --serif: 'Source Serif 4', Georgia, serif;
+    --display: 'Cormorant Garamond', serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+    /* driven by scroll velocity */
+    --murk: 0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: auto; }
+
+  body {
+    background: var(--ground);
+    color: var(--bone);
+    font-family: var(--serif);
+    font-weight: 300;
+    font-size: 19px;
+    line-height: 1.72;
+    letter-spacing: 0.002em;
+    overflow-x: hidden;
+  }
+
+  /* ==================================================================
+     THE SILT. It clouds when you move fast. It settles slowly.
+     Clouding is instant. Clearing takes patience. That asymmetry
+     is the argument.
+     ================================================================== */
+  #silt {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    opacity: calc(var(--murk) * 0.9);
+  }
+
+  .haze {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background:
+      radial-gradient(70% 60% at 50% 40%, rgba(74,83,68,0.55), transparent 78%),
+      linear-gradient(180deg, rgba(20,23,21,0.35), rgba(13,15,14,0.6));
+    opacity: calc(var(--murk) * 0.85);
+    transition: opacity 90ms linear;
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    filter: blur(calc(var(--murk) * 2.1px));
+    opacity: calc(1 - var(--murk) * 0.32);
+  }
+
+  /* ==================================================================
+     THE GAUGE. You are reading upstream. It tells you how far.
+     ================================================================== */
+  .gauge {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 108px;
+    z-index: 5;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: 8.5px;
+    letter-spacing: 0.22em;
+    color: var(--iron);
+    text-transform: uppercase;
+  }
+  .gauge__rail {
+    position: absolute;
+    left: 62px; top: 96px; bottom: 96px;
+    width: 1px;
+    background: linear-gradient(180deg, var(--silt-dim), rgba(109,115,112,0.25));
+  }
+  .gauge__strata { position: absolute; left: 52px; top: 96px; bottom: 96px; width: 22px; }
+  .gauge__strata i {
+    position: absolute; left: 0; width: 100%; height: 1px;
+    background: rgba(109,115,112,0.30);
+  }
+  .gauge__strata i.major { background: rgba(124,138,111,0.6); width: 32px; }
+
+  .gauge__mark {
+    position: absolute;
+    left: 55px;
+    width: 15px; height: 1.5px;
+    background: var(--bone);
+    box-shadow: 0 0 8px rgba(216,211,198,0.5);
+    transition: none;
+  }
+  .gauge__head {
+    position: absolute; top: 62px; left: 20px;
+    writing-mode: vertical-rl; text-orientation: mixed;
+    color: var(--silt);
+  }
+  .gauge__read {
+    position: absolute; left: 84px;
+    transform: translateY(-50%);
+    white-space: nowrap;
+    color: var(--bone-dim);
+    letter-spacing: 0.16em;
+  }
+  .gauge__foot {
+    position: absolute; bottom: 58px; left: 20px;
+    writing-mode: vertical-rl; text-orientation: mixed;
+  }
+
+  /* ==================================================================
+     THE COLUMN
+     ================================================================== */
+  .column {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 22vh 32px 34vh;
+  }
+
+  .part {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--silt);
+    margin-bottom: 14px;
+  }
+  .title {
+    font-family: var(--display);
+    font-weight: 300;
+    font-size: clamp(44px, 7vw, 78px);
+    line-height: 0.98;
+    letter-spacing: -0.012em;
+    color: var(--bone);
+    margin-bottom: 4vh;
+  }
+  .rule {
+    height: 1px; width: 100%;
+    background: linear-gradient(90deg, var(--silt-dim), transparent);
+    margin-bottom: 12vh;
+  }
+
+  p { margin-bottom: 1.55em; }
+
+  .lede { font-size: 21px; color: var(--bone); }
+  .short { margin-bottom: 2.6em; }
+
+  em, i { font-style: italic; }
+  q, .said {
+    font-style: italic;
+    color: var(--still);
+  }
+
+  /* ==================================================================
+     THE REFRAIN. It is the current. It is the only thing in this
+     essay that moves sideways.
+     ================================================================== */
+  .refrain {
+    position: relative;
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 25px;
+    line-height: 1.3;
+    color: var(--silt);
+    margin: 4.4em 0 4.4em;
+    padding-left: 0;
+    white-space: nowrap;
+    will-change: transform;
+  }
+  .refrain::before {
+    content: "";
+    position: absolute;
+    left: -100vw; right: calc(100% + 22px);
+    top: 50%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,138,111,0.42));
+  }
+  .refrain::after {
+    content: "";
+    position: absolute;
+    left: calc(100% + 22px); right: -100vw;
+    top: 50%; height: 1px;
+    background: linear-gradient(90deg, rgba(124,138,111,0.42), transparent);
+  }
+  .refrain .lead {
+    font-family: var(--serif);
+    font-style: normal;
+    color: var(--bone-dim);
+    font-size: 19px;
+    margin-right: 0.35em;
+  }
+
+  /* ==================================================================
+     THE STILL PASSAGES. Renee Goode. Alex Pretti.
+     Everything on this page moves except these two.
+     ================================================================== */
+  .still {
+    color: var(--still);
+    border-left: 1px solid var(--silt-dim);
+    padding-left: 26px;
+    margin: 3.4em 0;
+  }
+  .still p { margin-bottom: 1.35em; }
+  .still p:last-child { margin-bottom: 0; }
+  .still .name {
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--iron);
+    display: block;
+    margin-bottom: 1.1em;
+  }
+
+  /* ==================================================================
+     ENTRANCE. Prose surfaces. The still passages do not.
+     ================================================================== */
+  .rise { opacity: 0; transform: translateY(14px); }
+  .rise.up {
+    animation: rise 1.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  .refrain.rise { transform: translateX(-26px); opacity: 0; }
+  .refrain.rise.up { animation: sweep 2.6s cubic-bezier(0.16,1,0.3,1) forwards; }
+  @keyframes sweep { to { opacity: 1; transform: none; } }
+
+  /* the refrain never stops drifting once it has arrived */
+  .refrain.up { animation: sweep 2.6s cubic-bezier(0.16,1,0.3,1) forwards, drift 26s ease-in-out 2.6s infinite; }
+  @keyframes drift {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(16px); }
+  }
+
+  .end {
+    margin-top: 16vh;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--iron);
+  }
+
+  /* ---- quality floor ---- */
+  @media (prefers-reduced-motion: reduce) {
+    main { filter: none !important; opacity: 1 !important; }
+    #silt, .haze { display: none; }
+    .rise, .refrain.rise { opacity: 1 !important; transform: none !important; animation: none !important; }
+  }
+
+  @media (max-width: 860px) {
+    .gauge { display: none; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+    .column { padding: 14vh 22px 24vh; }
+    .refrain { font-size: 21px; white-space: normal; }
+    .refrain::before, .refrain::after { display: none; }
+    .still { padding-left: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="silt"></canvas>
+<div class="haze"></div>
+
+<aside class="gauge" aria-hidden="true">
+  <div class="gauge__head">Upstream</div>
+  <div class="gauge__rail"></div>
+  <div class="gauge__strata" id="strata"></div>
+  <div class="gauge__mark" id="mark"></div>
+  <div class="gauge__read" id="read">0.00 · surface</div>
+  <div class="gauge__foot">Source</div>
+</aside>
+
+<main>
+  <article class="column">
+
+    <div class="part rise">Part I</div>
+    <h1 class="title rise">Source Water</h1>
+    <div class="rule rise"></div>
+
+    <p class="lede rise">We were told this country was a river. Freedom flowing from mountains of intention toward oceans of possibility. We were told the current was natural, inevitable, self-renewing.</p>
+
+    <p class="rise">But rivers do not flow by themselves. They flow because something upstream pushes them. They flow because something upstream refuses to stop.</p>
+
+    <p class="short rise">And we are upstream.</p>
+
+    <p class="rise">I think of water when I think of this nation. The way it remembers every hand that touched it. The way it carries silt and bone and prayer and history. The way it forgives nothing and forgets nothing. The way it moves forward regardless of whether anyone understands what they have poured into it.</p>
+
+    <p class="rise">You can poison a river quietly. You can bless it in silence. Either way, the children downstream will drink what you leave them.</p>
+
+    <p class="rise">We pretend politics is downstream. We pretend presidents and congresses and courts determine the direction. They do not.</p>
+
+    <p class="rise">They drink what we pour. They swim in what we normalize. They govern the sediment we deposit through language, through silence, through what we choose to pretend is normal.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">I have been thinking about two people. Renee Goode. Alex Pretti.</p>
+
+    <p class="short rise">Not as headlines.</p>
+    <p class="short rise">Not as evidence.</p>
+    <p class="short rise">Not as an instrument of politics.</p>
+
+    <p class="rise">As human beings who walked into a day and did not walk out.</p>
+
+    <div class="still">
+      <span class="name">Renee Goode</span>
+      <p>Renee Goode said, “That’s fine, dude. I’m not mad at you.” There is something unbearably American in that sentence. The belief that civility is protection. The belief that politeness is a barrier. The belief that saying <i>I’m not mad</i> might keep the world from becoming what it is about to become.</p>
+    </div>
+
+    <div class="still">
+      <span class="name">Alex Pretti</span>
+      <p>Alex Pretti knelt. Not in protest. Not in theater. Bent into that strange half-kneel where the body understands before the mind that something irreversible is about to happen. In that posture every soldier knows, the posture where time slows to a crawl and the future becomes uncertain and the present becomes unbearable.</p>
+    </div>
+
+    <p class="rise">They were not symbols until we made them symbols. They were not metaphors until power turned them into metaphors. They were not river until we poured them into it.</p>
+
+    <p class="short rise">They were just people moving through a day.</p>
+
+    <p class="short rise">Now they are water.</p>
+
+    <p class="rise">America has always been a water story. The pilgrims crossed water. The enslaved crossed water. The immigrants crossed water. The soldiers crossed water. The refugees crossed water.</p>
+
+    <p class="short rise">We baptize. We flood. We dam. We drown.</p>
+
+    <p class="rise">We speak of tides of people. Waves of crime. Streams of misinformation.</p>
+
+    <p class="short rise">We are a nation that understands power only as current.</p>
+
+    <p class="rise">And we forget that current begins somewhere.</p>
+
+    <p class="rise">I grew up believing this country was held together by institutions. Courts. Constitutions. Checks and balances. Documents on classroom walls.</p>
+
+    <p class="rise">Then I learned that paper does not restrain power. People restrain power.</p>
+
+    <p class="short rise">And these people are tired.</p>
+
+    <p class="rise">Fatigue is the quietest tyrant. It does not wear a uniform. It comes in pajamas, ignoring another story, deciding that this one is too heavy, too complex, too likely to end in argument.</p>
+
+    <p class="short rise">Fatigue tells you to let the river run.</p>
+
+    <p class="refrain rise"><span class="lead">But….</span>The river flows from us.</p>
+
+    <p class="rise">There is a lie we tell ourselves about history. We imagine turning points as dramatic. Crowds. Speeches. Shots fired at dawn.</p>
+
+    <p class="rise">History is more often a couch and a phone and a quiet decision to remain silent.</p>
+
+    <p class="rise">History is a joke that succeeds because no one interrupts it. History is a tweet that goes viral because outrage is fun and correction is work. History is a conversation where someone says, “Well, they had it coming,” and nobody says, ‘No, they didn’t.’</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">We think cruelty requires cruelty. It does not. Cruelty requires apathy, repetition, and consent.</p>
+
+    <p class="rise">Consent is given in language. In memes. In metaphors. In the smallest of discriminations of who counts as a person.</p>
+
+    <p class="rise">When a president calls people vermin, he is not just insulting. He is teaching ears how to hear. When a governor calls a dead woman a terrorist, she is not just speaking. She is placing her in a category that does not require mourning. When a congressman says, “Well done,” to a murder, he is not just posting. He is blessing the current.</p>
+
+    <p class="short rise">Cruelty is also whispered.</p>
+
+    <p class="rise">It is whispered when people who know better say, “Let’s wait for more information,” even when the information is on video. It is whispered when people who know better say, “This is complicated,” when complexity is being used to obscure clarity. It is whispered when people who know better say, “I don’t want to alienate anyone,” as if truth were a social faux pas.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">We are upstream of language. We are upstream of memes. We are upstream of the words our children will learn to use before they learn to think.</p>
+
+    <p class="rise">Every phrase is a tributary. Every joke is a tributary. Every silence is a tributary.</p>
+
+    <p class="rise">We have poured sarcasm into the water and wondered why empathy died. We have poured tribalism into the water and wondered why compromise feels impossible. We have poured spectacle into the water and wondered why governance feels like theater.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="short rise">I am not innocent here. None of us are.</p>
+
+    <p class="rise">I have laughed at things I should have stopped. I have shared things I should have interrogated. I have remained silent when silence was easier than conflict.</p>
+
+    <p class="rise">We like villains with capes and dictators with speeches. They make guilt understandable. The truth is much harder to digest. Most historical disasters are built by people doing normal things and deciding they are too tired to intervene.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">There were men once who believed a man’s body could be a bridge. Men who believed their life was something that could be traded for a stranger’s future.</p>
+
+    <p class="rise">They died in surf, in jungles, in deserts, in cities whose pronunciation they could not know. They died for people who would never know who they were. They died believing that a future existed that justified the sacrifice.</p>
+
+    <p class="rise">We inherit their bones. We inherit their myths. We inherit their debt.</p>
+
+    <p class="short rise">And what have we done with that inheritance?</p>
+
+    <p class="rise">We have turned courage into branding. We have turned sacrifice into decals. We have turned brotherhood into a hashtag.</p>
+
+    <p class="rise">The men who died for this country did not die so that killing could be applauded. They died so that killing would be restrained by law, by conscience, by trembling hands.</p>
+
+    <p class="short rise">And yet here we are, applauding.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">Christianity taught this country that every person is an icon of God.</p>
+
+    <p class="rise">Patriotism taught this country that every citizen is an icon of law.</p>
+
+    <p class="short rise">We traded both for tribe.</p>
+
+    <p class="rise">We traded neighbor for narrative. We traded mercy for memes. We traded conscience for dopamine.</p>
+
+    <p class="rise">The river did not judge us. It bore what we poured.</p>
+
+    <p class="rise">I imagine Renee Goode’s children someday standing on a bank, asking what their mother’s death meant. I imagine Alex Pretti’s friends replaying the video, second by second, searching for the moment where history could have been changed.</p>
+
+    <p class="rise">I imagine a future child asking you what you did when people were killed and laughed about.</p>
+
+    <p class="rise">You will not be asked how you voted. You will be asked what you allowed to flow.</p>
+
+    <p class="rise">We are taught that history is downstream, that our influence is microscopic, that power is elsewhere. This is comforting.</p>
+
+    <p class="short rise">This is also false.</p>
+
+    <p class="rise">Power is downstream of culture. Culture is downstream of speech. Speech is downstream of conscience.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">There is a terror in realizing that the nation is not a machine but a system of storms, and you are part of the atmosphere. You are not a spectator. You are humidity. You are pressure. You are wind.</p>
+
+    <p class="rise">And when storms come, you will have helped make them.</p>
+
+    <p class="rise">We talk about democracy as if it were a thing. It is not a thing. It is a habit. A fragile, exhausting, daily habit.</p>
+
+    <p class="rise">It requires people who are willing to be awkward. Who are willing to say, <i>That joke is wrong.</i> Who are willing to say, <i>That story is false.</i> Who are willing to say, <i>That death matters.</i></p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">This is not a speech about politics. This is a speech about origin. About source water. About the quiet choices that become brutal currents.</p>
+
+    <p class="rise">Before the shot, there is a word. Before the policy, there is a meme. Before the regime, there is a joke.</p>
+
+    <p class="rise">We think tyranny arrives in a torrent. It does not. It seeps.</p>
+
+    <p class="rise">It seeps through language. It seeps through laughter. It seeps through fatigue. It seeps through silence.</p>
+
+    <p class="rise">And one day you wake up and the water tastes different, and you do not know when it changed.</p>
+
+    <p class="refrain rise">The river flows from us.</p>
+
+    <p class="rise">I want you to feel that burden. Not as guilt. As the force that it is.</p>
+
+    <p class="rise">Because force is what keeps rivers from floating into the sky. Force is what makes consequences real.</p>
+
+    <p class="short rise" style="font-size:28px; font-family:var(--display); font-style:italic; color:var(--bone);">We are force.</p>
+
+    <div class="end rise">End of Part I</div>
+
+  </article>
+</main>
+
+<script>
+(function () {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const root = document.documentElement;
+
+  /* ---------- entrance ---------- */
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('up'); io.unobserve(e.target); } });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  document.querySelectorAll('.rise').forEach(el => io.observe(el));
+
+  /* ---------- the gauge ---------- */
+  const strata = document.getElementById('strata');
+  const mark   = document.getElementById('mark');
+  const read   = document.getElementById('read');
+
+  if (strata) {
+    for (let i = 0; i <= 40; i++) {
+      const t = document.createElement('i');
+      t.style.top = (i * 2.5) + '%';
+      if (i % 5 === 0) t.className = 'major';
+      strata.appendChild(t);
+    }
+  }
+
+  /* ---------- silt ---------- */
+  const cv = document.getElementById('silt');
+  const ctx = cv && cv.getContext ? cv.getContext('2d') : null;
+  let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const grains = [];
+
+  function size() {
+    W = window.innerWidth; H = window.innerHeight;
+    if (!cv) return;
+    cv.width = W * dpr; cv.height = H * dpr;
+    cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  size();
+  addEventListener('resize', size);
+
+  for (let i = 0; i < 220; i++) {
+    grains.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 1.7 + 0.4,
+      vy: Math.random() * 0.10 + 0.02,
+      vx: (Math.random() - 0.5) * 0.05,
+      a: Math.random() * 0.5 + 0.15,
+      ph: Math.random() * Math.PI * 2
+    });
+  }
+
+  /* ---------- scroll physics ----------
+     Clouding is immediate. Settling is slow. Skimming costs you
+     the page; sitting still gives it back. */
+  let lastY = scrollY, vel = 0, murk = 0;
+
+  function frame() {
+    requestAnimationFrame(frame);
+
+    const y = scrollY;
+    const dy = Math.abs(y - lastY);
+    lastY = y;
+
+    // instantaneous velocity, lightly smoothed
+    vel += (dy - vel) * 0.35;
+
+    // target murk from velocity. ~14px/frame of scroll fully clouds it.
+    const target = Math.min(vel / 14, 1);
+
+    // rise fast, fall slow
+    const k = target > murk ? 0.22 : 0.014;
+    murk += (target - murk) * k;
+    if (murk < 0.0008) murk = 0;
+
+    root.style.setProperty('--murk', murk.toFixed(4));
+
+    // gauge
+    const max = Math.max(1, document.body.scrollHeight - innerHeight);
+    const p = Math.min(y / max, 1);
+    if (mark && read) {
+      const railTop = 96, railH = innerHeight - 192;
+      mark.style.top = (railTop + railH * (1 - p)) + 'px';   // reading upstream: the mark climbs
+      read.style.top = (railTop + railH * (1 - p)) + 'px';
+      const depth = (p).toFixed(2);
+      read.textContent = depth + (p > 0.985 ? ' · source' : p < 0.01 ? ' · surface' : ' · upstream');
+    }
+
+    // silt
+    if (ctx) {
+      if (murk < 0.006) { ctx.clearRect(0, 0, W, H); return; }
+      ctx.clearRect(0, 0, W, H);
+      const density = 0.35 + murk * 0.65;
+      for (const g of grains) {
+        g.ph += 0.01;
+        g.y += g.vy * 0.0016 + murk * 0.0022;
+        g.x += (g.vx + Math.sin(g.ph) * 0.25) * 0.0008;
+        if (g.y > 1.02) { g.y = -0.02; g.x = Math.random(); }
+        if (g.x > 1.02) g.x = -0.02;
+        if (g.x < -0.02) g.x = 1.02;
+        ctx.beginPath();
+        ctx.arc(g.x * W, g.y * H, g.r * (0.6 + murk * 0.9), 0, 6.2832);
+        ctx.fillStyle = 'rgba(124,138,111,' + (g.a * density * murk).toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+  }
+
+  if (!reduce) frame();
+  else document.querySelectorAll('.rise').forEach(el => el.classList.add('up'));
+})();
+</script>
+
+</body>
+</html>

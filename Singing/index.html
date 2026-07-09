@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Singing My Song</title>
+<meta name="description" content="A poem in two voices: the singer and the one who wants the song back.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Courier+Prime:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0e0c0b;
+    --self:      #e8e4de;   /* the given voice, plain */
+    --song:      #7aafc8;   /* the singer */
+    --song-dim:  #5a8ea8;
+    --interro:   #9a8f82;   /* the interrogator, typewritten */
+    --command:   #a09888;   /* the shout */
+    --faint:     #8a8078;
+    --steel-1:   #9ab8c8;
+    --steel-2:   #6a96aa;
+    --steel-3:   #4a7488;
+
+    --serif: 'Cormorant Garamond', serif;
+    --mono:  'Courier Prime', ui-monospace, monospace;
+
+    --step: 55px;   /* one indent of the descending staircase */
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: #c8bfaf;
+    font-family: var(--serif);
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 90px 0 160px;
+    overflow-x: hidden;
+  }
+
+  .poem {
+    max-width: 580px;
+    margin: 0 auto;
+    padding: 0 36px;
+  }
+
+  /* ---------------------------------------------------------
+     Structure: the poem is a sequence of exchanges. Spacing is
+     a property of the stanza, not an empty element in the text.
+     --------------------------------------------------------- */
+  .stanza { margin-block-end: 46px; }
+  .stanza--breath { margin-block-end: 80px; }
+  .stanza:last-child { margin-block-end: 0; }
+
+  .stanza > * + * { margin-block-start: 22px; }
+  .stanza--tight > * + * { margin-block-start: 0; }
+
+  /* ---------------------------------------------------------
+     The three voices
+     --------------------------------------------------------- */
+  .line {
+    display: block;
+    font-size: 21px;
+    line-height: 1.9;
+    color: var(--self);
+  }
+
+  .song {
+    display: block;
+    font-size: 21px;
+    line-height: 1.9;
+    color: var(--song);
+    font-style: italic;
+  }
+
+  .interrogator {
+    display: block;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    letter-spacing: 0.03em;
+    color: var(--interro);
+    padding-inline-start: calc(var(--step) * 3);
+  }
+
+  .command {
+    display: block;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 2;
+    letter-spacing: 0.25em;
+    color: var(--command);
+  }
+
+  /* ---------------------------------------------------------
+     Modifiers
+     --------------------------------------------------------- */
+  .in-1 { padding-inline-start: calc(var(--step) * 1); }
+  .in-2 { padding-inline-start: calc(var(--step) * 2); }
+  .in-3 { padding-inline-start: calc(var(--step) * 3); }
+  .in-4 { padding-inline-start: calc(var(--step) * 4); }
+  .in-5 { padding-inline-start: calc(var(--step) * 5); }
+  .in-6 { padding-inline-start: calc(var(--step) * 6); }
+
+  .is-faint      { color: var(--faint); }
+  .song.is-faint { color: var(--song-dim); font-style: italic; }
+
+  .is-right { text-align: right; }
+  .is-small { font-size: 14px; }
+  .is-tiny  { font-size: 12px; font-family: var(--mono); letter-spacing: 0.05em; }
+
+  .steel-1 { color: var(--steel-1); font-size: 21px; font-style: italic; }
+  .steel-2 { color: var(--steel-2); font-size: 17px; font-style: italic; }
+  .steel-3 { color: var(--steel-3); font-size: 13px; font-style: italic; font-family: var(--mono); }
+
+  /* ---------------------------------------------------------
+     Motion. Each voice enters the way it speaks.
+     --------------------------------------------------------- */
+  .poem [data-voice] { opacity: 0; will-change: opacity, transform, filter; }
+
+  /* the singer: swells up into the note */
+  .poem .song {
+    transform: translateY(8px);
+    filter: blur(3px);
+  }
+  .poem .song.is-in { animation: swell 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+  @keyframes swell { to { opacity: 1; transform: none; filter: blur(0); } }
+
+  /* the given voice: sets down flat, no swell, nothing earned */
+  .poem .line { transform: translateY(5px); }
+  .poem .line.is-in { animation: setDown 1s ease forwards; }
+  @keyframes setDown { to { opacity: 1; transform: none; } }
+
+  /* the interrogator: types. clipped, mechanical, no fade */
+  .poem .interrogator { transform: none; }
+  .poem .interrogator.is-in {
+    opacity: 1;
+    animation: typeIn 0.9s steps(28, end) forwards, caret 0.9s steps(1, end) 1;
+    clip-path: inset(0 100% 0 0);
+    border-inline-end: 1px solid transparent;
+  }
+  @keyframes typeIn { to { clip-path: inset(0 0 0 0); } }
+  @keyframes caret {
+    0%, 99%  { border-inline-end-color: var(--interro); }
+    100%     { border-inline-end-color: transparent; }
+  }
+
+  /* the command: lands. a strike, then a shudder */
+  .poem .command { transform: scale(1.04); }
+  .poem .command.is-in { animation: strike 0.55s cubic-bezier(0.2, 0, 0, 1) forwards; }
+  @keyframes strike {
+    0%   { opacity: 0; transform: scale(1.06); letter-spacing: 0.5em; }
+    60%  { opacity: 1; transform: scale(0.995); letter-spacing: 0.23em; }
+    100% { opacity: 1; transform: none; letter-spacing: 0.25em; }
+  }
+
+  /* the shout knocks the page. the singer does not move. */
+  body.is-struck { animation: shudder 0.4s ease; }
+  @keyframes shudder {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-2px); }
+    75%      { transform: translateX(2px); }
+  }
+
+  /* the last descent: each step further out, further away, colder */
+  .descent .song.is-in,
+  .descent .line.is-in { animation-duration: 2.2s; }
+  .descent .steel-3.is-in { animation: swell 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+  /* the closing line keeps breathing after it lands */
+  .steel-3.is-in { animation: swell 2.8s cubic-bezier(0.16,1,0.3,1) forwards, hold 9s ease-in-out 2.8s infinite; }
+  @keyframes hold {
+    0%, 100% { opacity: 0.62; }
+    50%      { opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .poem [data-voice] {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+      clip-path: none !important;
+      animation: none !important;
+    }
+    body.is-struck { animation: none; }
+  }
+
+  @media (max-width: 640px) {
+    :root { --step: 26px; }
+    body { padding: 56px 0 100px; }
+    .poem { padding: 0 20px; }
+    .line, .song { font-size: 18px; }
+    .interrogator { font-size: 12px; padding-inline-start: calc(var(--step) * 2); }
+  }
+</style>
+</head>
+<body>
+
+<main class="poem">
+
+  <section class="stanza" aria-label="Opening">
+    <p class="song" data-voice="song">there is a song</p>
+    <p class="interrogator" data-voice="interrogator">which one</p>
+    <p class="song" data-voice="song">mine</p>
+    <p class="interrogator" data-voice="interrogator">prove it</p>
+  </section>
+
+  <section class="stanza" aria-label="Twenty years">
+    <p class="song" data-voice="song">for twenty years I sang on cue</p>
+    <p class="interrogator" data-voice="interrogator">and you were good at it</p>
+    <p class="song in-1" data-voice="song">I was obedient at it</p>
+    <p class="interrogator" data-voice="interrogator">same thing</p>
+    <p class="song in-2 is-small is-faint" data-voice="song">it isn't</p>
+  </section>
+
+  <section class="stanza" aria-label="The command">
+    <p class="command" data-voice="command" data-strike>Sing what we gave you.</p>
+    <p class="song in-1" data-voice="song">No.</p>
+    <p class="command" data-voice="command" data-strike>Sing our words.</p>
+    <p class="song in-1" data-voice="song">I used to.</p>
+    <p class="song in-1 is-faint is-small" data-voice="song">I'm not doing that anymore.</p>
+  </section>
+
+  <section class="stanza stanza--breath" aria-label="The key">
+    <p class="song" data-voice="song">the key was always wrong</p>
+    <p class="interrogator" data-voice="interrogator">wrong for who</p>
+    <p class="song" data-voice="song">Me.</p>
+    <p class="interrogator" data-voice="interrogator">you'll sound like a fool</p>
+    <p class="song" data-voice="song">So?</p>
+    <p class="interrogator" data-voice="interrogator">you'll embarrass yourself</p>
+    <p class="song" data-voice="song">I've been embarrassed all my life</p>
+  </section>
+
+  <section class="stanza stanza--tight" aria-label="What they gave">
+    <p class="line is-right is-small" data-voice="line">they gave me the words</p>
+    <p class="line is-right is-small" data-voice="line">they gave me the tune</p>
+    <p class="line is-right is-small" data-voice="line">they gave me the right way to end it</p>
+    <p class="line is-right is-small is-faint" data-voice="line">I sang it so well</p>
+    <p class="line is-right is-tiny is-faint" data-voice="line">I almost believed it was me</p>
+  </section>
+
+  <section class="stanza stanza--breath" aria-label="What changed">
+    <p class="interrogator" data-voice="interrogator">so what changed</p>
+    <p class="song in-1" data-voice="song">I got tired of the attention</p>
+    <p class="interrogator" data-voice="interrogator">that doesn't make sense</p>
+    <p class="song in-1" data-voice="song">I know</p>
+    <p class="interrogator" data-voice="interrogator">explain it</p>
+    <p class="song in-2 is-small is-faint" data-voice="song">I don't think I will.</p>
+  </section>
+
+  <section class="stanza stanza--breath" aria-label="Unfinished">
+    <p class="line" data-voice="line">I will sing...</p>
+    <p class="song in-1" data-voice="song">something unfinished</p>
+    <p class="interrogator" data-voice="interrogator">keep going</p>
+    <p class="song" data-voice="song">it's becoming a song</p>
+    <p class="interrogator" data-voice="interrogator">nobody will know it</p>
+    <p class="song" data-voice="song">and that's the point.</p>
+  </section>
+
+  <section class="stanza" aria-label="Someone will hate it">
+    <p class="line is-right is-small is-faint" data-voice="line">someone will hate it</p>
+    <p class="song is-right is-small is-faint" data-voice="song">yes</p>
+    <p class="line is-right is-small is-faint" data-voice="line">someone already does</p>
+    <p class="song is-right is-small is-faint" data-voice="song">yes</p>
+  </section>
+
+  <section class="stanza descent" aria-label="Closing descent">
+    <p class="song" data-voice="song">there is a song</p>
+    <p class="song in-1" data-voice="song">you won't know the words</p>
+    <p class="line in-2 is-faint" data-voice="line">good</p>
+    <p class="song in-3 steel-1" data-voice="song">neither did I</p>
+    <p class="song in-4 steel-2" data-voice="song">until I stopped</p>
+    <p class="song in-5 steel-2" data-voice="song">waiting</p>
+    <p class="song in-6 steel-3" data-voice="song">to be given them</p>
+  </section>
+
+</main>
+
+<script>
+  (function () {
+    const lines = Array.from(document.querySelectorAll('[data-voice]'));
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduce) {
+      lines.forEach(el => el.classList.add('is-in'));
+      return;
+    }
+
+    /* Each voice takes its own time to answer. The interrogator is quick.
+       The singer takes longer, because saying it costs something. */
+    const beat = { command: 900, song: 620, line: 380, interrogator: 480 };
+
+    let i = 0;
+    function next() {
+      if (i >= lines.length) return;
+      const el = lines[i++];
+      el.classList.add('is-in');
+
+      if (el.hasAttribute('data-strike')) {
+        document.body.classList.add('is-struck');
+        setTimeout(() => document.body.classList.remove('is-struck'), 400);
+      }
+
+      setTimeout(next, beat[el.dataset.voice] || 500);
+    }
+
+    setTimeout(next, 500);
+  })();
+</script>
+
+</body>
+</html>
