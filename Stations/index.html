@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #121310;
+    --ink: #cfc9bb;
+    --print: rgba(205, 193, 168, 0.11);
+    --dapple: rgba(232, 202, 140, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.08rem, 1.4vw, 1.24rem);
+    line-height: 1.9;
+    overflow-x: hidden;
+  }
+
+  main {
+    max-width: 33rem;
+    margin: 0 auto;
+    padding: 20vh 7vw 0;
+  }
+
+  .p { margin: 0; }
+
+  .iso {
+    text-align: center;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.3rem, 2.5vw, 1.65rem);
+  }
+
+  /* ---- the walking between stations ---- */
+  .walk {
+    position: relative;
+    height: 16vh;
+    min-height: 120px;
+  }
+  .walk.final {
+    height: 175vh;
+  }
+  .step {
+    position: absolute;
+    left: 50%;
+    width: 9px;
+    height: 21px;
+    border-radius: 50% 50% 45% 45%;
+    background: var(--print);
+    opacity: 0;
+    transition: opacity 1.4s ease;
+  }
+  .step.laid { opacity: 1; }
+
+  /* ---- the groves: light that parts like branches ---- */
+  .grove {
+    position: relative;
+  }
+  .grove .pool {
+    position: absolute;
+    inset: -9vh -18vw;
+    z-index: -2;
+    opacity: 0;
+    background:
+      radial-gradient(circle at 24% 30%, var(--dapple) 0%, transparent 34%),
+      radial-gradient(circle at 68% 18%, var(--dapple) 0%, transparent 28%),
+      radial-gradient(circle at 46% 62%, var(--dapple) 0%, transparent 38%),
+      radial-gradient(circle at 82% 70%, var(--dapple) 0%, transparent 26%),
+      radial-gradient(circle at 14% 78%, var(--dapple) 0%, transparent 24%),
+      radial-gradient(circle at 55% 40%, var(--dapple) 0%, transparent 44%);
+    filter: blur(6px);
+    will-change: opacity;
+  }
+  .grove .branch {
+    position: absolute;
+    top: -12vh;
+    bottom: -12vh;
+    width: 68%;
+    z-index: -1;
+    background: var(--dark);
+    filter: blur(16px);
+    will-change: transform;
+  }
+  .grove .bl { left: -14%; border-radius: 0 46% 62% 0 / 0 55% 45% 0; }
+  .grove .br { right: -14%; border-radius: 52% 0 0 40% / 60% 0 0 42%; }
+
+  /* ---- the house at the end ---- */
+  #window {
+    display: block;
+    width: 22px;
+    height: 30px;
+    margin: 0 auto;
+    border-radius: 2px;
+    background: #e8c27a;
+    box-shadow: 0 0 26px 6px rgba(232, 194, 122, 0.28);
+    opacity: 0;
+    transition: opacity 6s ease;
+  }
+  #window.home { opacity: 0.9; }
+  #after { height: 24vh; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .step { transition: none; }
+    .grove .pool { opacity: 0.5 !important; }
+    .grove .branch { transform: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+
+  <p class="p">He held the wrench the way a monk holds a bell rope, not to ring it, but to feel the weight of what would soon be gone. The salt had dried into a pale crust along his cheekbones, like the ghost of a sea long forgotten. Everything in the shed was arranged with the care of a shrine, though nothing in it was sacred anymore. He tightened what could still be tightened. He left untouched what would only humiliate him by surviving.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <div class="grove">
+    <div class="pool"></div><div class="branch bl"></div><div class="branch br"></div>
+    <p class="p">The sun crawled across the concrete floor with the precision of a fine watch. He had learned its path over months, how it bathed the vise at eleven, the sawhorse at two, the oil stain shaped like a broken moon at four. Now it warmed a strip of his forearm, the hair there bleached almost white, the skin darkened to the color of leather. He did not move from its path. To do so would have been to acknowledge that he was tracking it, and to acknowledge that would have been to admit he was measuring time in a place he had built specifically to exist outside it.</p>
+  </div>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The boat motor sat disassembled on the workbench in a manner that resembled autopsy more than repair. Each component had been cleaned with a care that bordered on ceremony. The carburetor in its bath of solvent, the spark plugs aligned like soldiers, the impeller blades fanned out in a perfect circle. He had done this work before, countless times, but never with such attention. The gaskets lay in ascending order of size. The bolts were grouped by thread pitch and length, each set occupying its own small dish that had once held food at a table where four people ate.</p>
+
+  <div class="walk" data-n="2"></div>
+
+  <p class="p">His hands moved without thought, following patterns worn into muscle and bone through decades of repetitive motions. Fingernail testing the gap of a spark plug. Thumb pressing the spring tension of a valve. Feeling for the microscopic pitting that would mean replacement of a piston. These required no thought, which meant they permitted all thought, and that was their danger and their use.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The shirt he wore had been washed so many times that the fabric had achieved the softness of something much more expensive, the blue faded to the color of a forlorn sky. It hung on him differently now. Six months ago it had pulled across his shoulders when he reached overhead. Now it draped. He had not eaten less, but his body had consumed itself, converting substance into absence, flesh into a lesser form of presence. His face in the square of mirror hung above the utility sink looked carved rather than lived in.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The house was silent. This was not unusual. The house had been built for sound. For the thumping of children&rsquo;s feet on stairs, for the screams and laughs in hallways, for doors closing and signaling someone was home, someone was safe. In its silence it was like an instrument no longer played, filled with the memory of music it could no longer produce. He did not go there except to shower and to sleep, and when he slept he did so with the discipline of a soldier at camp, making no concession to comfort, asking nothing of the darkness except that it end.</p>
+
+  <div class="walk" data-n="4"></div>
+
+  <p class="p">The shed had been his before, but in a different way. Then it had been the pursuit of leisure, of projects undertaken for pleasure or necessity but always with the understanding that they were supplemental to the main direction of his life. Now it was the action. The only action. He arrived at seven each morning with the same canvas tool bag, wearing the same clothes, carrying the same thermos of black coffee. He left at six each evening when the light made it impossible to see properly, though he had a standing lamp he chose not to use. The hours between had the feeling of prayer, not because anything in them reached toward the divine, but because they were offered up, again and again, in the faith that repetition itself was a form of meaning.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">On the bench beside the motor lay a manual, its pages soft as cloth from handling, many passages underlined, some annotated in a handwriting that was not his. The notes were brief, technical, entirely unsentimental. Check this first, common failure point, torque to spec. They had been made by someone who understood that competence was a form of love, that to maintain a thing properly was to honor both the thing and the person who depended on it. He had learned this too late, and come to it only after years of assuming that love announced itself in obvious ways. Now he knew better. Now he understood that love could be a properly gapped spark plug, a fuel filter changed on schedule, a hull inspected each spring with a penlight and a patient hand.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The impeller had failed because of sand. A small thing, the width of a grain, that had worked its way into the seal and created a channel for water to enter where water should not go. The damage had been progressive, invisible, catastrophic. By the time the overheat alarm sounded they were two miles offshore. They had limped back on one cylinder, the hull wallowing in the chop, and when they reached the dock the engine had seized completely. That was April. This was October. The motor had sat since then, accusatory in its silence, until he could bear to touch it.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">He selected a file from the pegboard, a half-round bastard file, its surface crosshatched with use, and began to dress the edge of the damaged cylinder where the piston had scored it. The work required almost no pressure, just a steady back-and-forth motion that produced a sound like breathing. Metal filings clung to his fingers. He did not hurry. To hurry would have been to suggest the work was merely instrumental, a means to an end, when in fact it was the end itself, the only end available, the point at which his will still intersected with the physical world in a way that produced measurable results.</p>
+
+  <div class="walk" data-n="4"></div>
+
+  <p class="p">Outside, the wind meandered through the oak trees with a sound like distant water. October in this place meant the narrowing of things, the reduction of complexity to essence. Leaves fell not in the showering abundance of back east but singly, with intention. The light changed, became more honest, less forgiving. Mornings came later and he adjusted his schedule accordingly, arriving when there was just enough light to see by, no earlier.</p>
+
+  <div class="walk" data-n="2"></div>
+
+  <p class="p">This seemed important though he could not have said why.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">A photograph was taped to the wall above the bench, sun-faded to the tones of old newsprint. In it, two people stood beside a boat, the boat&rsquo;s name visible on the transom in confident script. The figures were smiling but the smiles were secondary to the way they stood, which spoke of comfort, of partnership, of the easy physicality of people who had learned to move in the small spaces. He did not look at this photograph often, but he refused to remove it. It existed in the periphery of his vision, neither sought nor avoided, like the light, like the sound of wind in the oaks, like all the other things that marked the passage of hours.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The cylinder would need to be bored and honed, which meant sending it out, which meant interacting with other people, which meant expanding the perimeter of this carefully controlled world. He had been avoiding this for weeks. The file could improve the surface but not restore it. Some damage could not be corrected by patience and simple tools. This was a fact. He set the file down, returned it to its exact position on the pegboard where its shadow had left a silhouette in the dust.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">From the tool bag he withdrew a piece of sandpaper, 400 grit, and tore it into a strip. He wrapped this around his index finger and began to polish the piston crown, working in small circles, the aluminum taking on a dull luster. This served no functional purpose. The crown would be hidden inside the cylinder, invisible during operation, relevant only in its combustion. But he polished it anyway, with the same care he brought to visible surfaces, because the work was not really about the engine, had never been about the engine, and both he and the engine understood this.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">His knees ached from standing. His lower back complained and he acknowledged that and ignored it in equal measure. The body, he had learned, was both more resilient and more fragile than he had believed in youth. It could endure extraordinary strain and it could be undone by the smallest forgetting. What it could not do was stop. The heart would beat. The lungs would fill. The blood would move through its appointed channels until the moment it stopped, and that moment was not subject to whim or negotiation. In this there was something almost comforting, a kind of clarity that made choice both impossible and irrelevant.</p>
+
+  <div class="walk" data-n="4"></div>
+
+  <div class="grove">
+    <div class="pool"></div><div class="branch bl"></div><div class="branch br"></div>
+    <p class="p">He thought of the sea, though he had not been on the water since April. It brought forth an image of morning light on calm water, the way distance looked blue even when you knew it was gray. Thought of the focus required to read current in the movement of kelp, to interpret the flight of birds, to know when the wind was building from the southwest and it was time to head in. These were skills that had taken years to acquire and they remained in him, useless now but ineradicable, like a language learned in childhood.</p>
+  </div>
+
+  <div class="walk" data-n="2"></div>
+
+  <p class="p">The sun had moved to the oil stain. Four o&rsquo;clock. Two hours remained.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">He assembled a parts list in the small notebook he kept in his shirt pocket, writing in the abbreviated script known only to him. The act of writing steadied him. Each letter had to be formed with intention. His hands no longer trusted themselves to casual gestures. The list grew methodical, complete, containing nothing extra and omitting nothing essential. When he finished he read it through twice, then copied it onto a clean page with even greater care, as if the second iteration could perfect what the first had only approximated.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The phone call could wait until tomorrow. Or the day after. The machine shop would have the parts in stock or they would order them. The work would take a week, perhaps two. This delay changed nothing. The boat sat under its tarp in the side yard, attended to but not used, maintained but not trusted. In this it resembled everything else.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">He cleaned the workbench with a precision that made ritual of utility. The porcelain dishes returned to the shelf, each to its designated position. The manual closed and aligned with the edge of the wood. The tools wiped down with an oiled rag and hung on their hooks, each one returning to its shadow. When he finished, the bench held only the disassembled engine, and even this was arranged with the severe beauty of a formal garden, everything in its right relation to everything else.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <div class="grove">
+    <div class="pool"></div><div class="branch bl"></div><div class="branch br"></div>
+    <p class="p">The light had reached the wall now, climbing toward the window like something returning to its source. He stood in the center of the shed and gazed upon the space, checking that everything was as it should be, that disorder had been returned to order, and that what could be controlled had been controlled. Tomorrow he would return and the light would trace the same path and he would continue the work of taking apart and putting back together, of measuring and adjusting, of bringing scattered components into right relation.</p>
+  </div>
+
+  <div class="walk" data-n="4"></div>
+
+  <p class="p iso">Some things break that cannot be fixed. Some things fix what cannot be broken.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">He had no answer to this paradox, no resolution to offer. But he had the work. He had the discipline of the morning&rsquo;s work and the evening&rsquo;s rest. He had the feel of tools in his hands and the sureness of torque specifications and the victories of a seal properly installed, a gasket correctly shimmed, a bolt tightened to exactly the tension required.</p>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">At the door he paused and looked back at the motor on the bench, its components gleaming in the last of the light. Tomorrow he would call the machine shop. Tomorrow he would begin the next phase of restoration. But today he had done what today allowed. He had attended to what remained with all the care he possessed, and offered up his hours to the work. He had honored what was broken by trying to make it whole.</p>
+
+  <div class="walk" data-n="2"></div>
+
+  <div class="grove">
+    <div class="pool"></div><div class="branch bl"></div><div class="branch br"></div>
+    <p class="p">He closed the door carefully, feeling the latch engage with a small, definitive sound. The light would continue its movement even after he left. It would touch the wall and then the window and then dissolve into evening. This would happen whether he witnessed it or not. There was something that pleasured him in this knowledge, something that made the walking back to the house possible, and made the next morning imaginable. It made the effort of continuing seem, if not easy, then at least clear.</p>
+  </div>
+
+  <div class="walk" data-n="3"></div>
+
+  <p class="p">The path from shed to house was worn smooth by his passage. Twenty-eight steps, a distance he had measured not with instruments but with thousands of daily crossings. He walked it now with neither hurry nor hesitation, a man moving between stations of the same devotion, carrying nothing but the emptiness of his hands and the discipline of return.</p>
+
+  <div class="walk final" data-n="28"></div>
+
+  <span id="window" aria-hidden="true"></span>
+  <div id="after"></div>
+
+</main>
+
+<script>
+(function () {
+  if (!window.matchMedia || !window.requestAnimationFrame) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+
+  /* ---- lay the footsteps into every walk ---- */
+  var walks = Array.prototype.slice.call(document.querySelectorAll('.walk'));
+  var side = 1;
+  walks.forEach(function (w) {
+    var n = parseInt(w.getAttribute('data-n'), 10) || 3;
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement('span');
+      s.className = 'step';
+      side = -side;
+      var drift = Math.sin((i / Math.max(1, n - 1)) * 2.4) * 8;   /* the path meanders a little */
+      s.style.top = (6 + (i / n) * 86) + '%';
+      s.style.marginLeft = (side * 11 + drift + (Math.random() - 0.5) * 4) + 'px';
+      s.style.transform = 'rotate(' + (side * (5 + Math.random() * 4)) + 'deg)';
+      w.appendChild(s);
+    }
+  });
+
+  /* footsteps appear as he passes, and remain. the path wears smooth. */
+  var steps = Array.prototype.slice.call(document.querySelectorAll('.step'));
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          var el = e.target;
+          setTimeout(function () { el.classList.add('laid'); }, 120 + Math.random() * 380);
+          io.unobserve(el);
+        }
+      });
+    }, { rootMargin: '0px 0px -18% 0px' });
+    steps.forEach(function (s) { io.observe(s); });
+  } else {
+    steps.forEach(function (s) { s.classList.add('laid'); });
+  }
+
+  /* ---- the groves: branches part as he steps into the light ---- */
+  var groves = Array.prototype.slice.call(document.querySelectorAll('.grove')).map(function (g) {
+    return {
+      el: g,
+      pool: g.querySelector('.pool'),
+      bl: g.querySelector('.bl'),
+      br: g.querySelector('.br')
+    };
+  });
+
+  if (!reduced) {
+    var ticking = false;
+    function part() {
+      ticking = false;
+      var vc = window.innerHeight * 0.5;
+      groves.forEach(function (g) {
+        var r = g.el.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > window.innerHeight + 200) return;
+        var c = r.top + r.height / 2;
+        var t = clamp(1 - Math.abs(c - vc) / (window.innerHeight * 0.62), 0, 1);
+        t = t * t * (3 - 2 * t);
+        g.pool.style.opacity = (t * 0.13).toFixed(3);
+        g.bl.style.transform = 'translateX(' + (-t * 82) + '%)';
+        g.br.style.transform = 'translateX(' + (t * 82) + '%)';
+      });
+    }
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(part); }
+    }, { passive: true });
+    part();
+  }
+
+  /* ---- the window at the end of the twenty-eight steps ---- */
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries, io) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          document.getElementById('window').classList.add('home');
+          io.disconnect();
+        }
+      });
+    }, { threshold: 0.8 }).observe(document.getElementById('window'));
+  }
+})();
+</script>
+
+</body>
+</html>

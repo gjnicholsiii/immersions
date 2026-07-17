@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Flashlight</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    height:100%;
+    background:#050403;
+    overflow:hidden;
+    font-family:'Cormorant Garamond',serif;
+  }
+
+  #stage {
+    position:fixed; inset:0;
+  }
+
+  /* the burnt ground - only legible where the beam falls */
+  #ground {
+    position:fixed; inset:0; z-index:1;
+    background-image: repeating-linear-gradient(115deg, rgba(120,90,60,0.10) 0px, rgba(120,90,60,0.10) 2px, transparent 2px, transparent 26px),
+                       repeating-linear-gradient(25deg, rgba(90,70,50,0.07) 0px, rgba(90,70,50,0.07) 1px, transparent 1px, transparent 40px);
+    opacity:0.5;
+  }
+
+  /* the beam - a warm circle that follows the pointer, lighting the ground */
+  #beam {
+    position:fixed; inset:0; z-index:2;
+    background: radial-gradient(circle 230px at var(--mx,50%) var(--my,50%), rgba(255,232,190,0.85), rgba(255,220,170,0.12) 55%, transparent 75%);
+    mix-blend-mode: screen;
+    transition: opacity 0.3s ease;
+  }
+
+  /* embers - always present, faint, indifferent to the beam */
+  #embers { position:fixed; inset:0; z-index:1; pointer-events:none; }
+  .ember {
+    position:absolute;
+    bottom:-4%;
+    width:2px; height:2px;
+    border-radius:50%;
+    background:#c98a4f;
+    opacity:0;
+    animation-name: rise;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+  }
+  @keyframes rise {
+    0% { transform:translate(0,0); opacity:0; }
+    8% { opacity:0.5; }
+    90% { opacity:0.15; }
+    100% { transform:translate(var(--dx,10px), -108vh); opacity:0; }
+  }
+
+  .frag {
+    position:absolute;
+    z-index:3;
+    max-width:270px;
+    font-size:19px;
+    line-height:1.4;
+    color:#c9c2b6;
+    opacity:0;
+    filter:blur(2px);
+    transition:opacity 0.35s ease, filter 0.35s ease;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+  }
+  .frag.s { color:#8b9297; letter-spacing:0.03em; }
+  .frag.d { font-style:italic; font-weight:500; color:#d08a52; }
+
+  #last {
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    z-index:3;
+    font-size:24px;
+    letter-spacing:0.14em;
+    color:#e8d3ab;
+    opacity:0;
+    filter:blur(3px);
+    transition:opacity 1.4s ease, filter 1.4s ease;
+    white-space:nowrap;
+    pointer-events:none;
+  }
+  #last.found { opacity:1; filter:blur(0); }
+
+  #flash {
+    position:fixed; inset:0; z-index:4; pointer-events:none;
+    background:#e8d3ab; opacity:0;
+  }
+
+  @media (max-width:640px) {
+    .frag { font-size:16px; max-width:220px; }
+    #last { font-size:19px; }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    #beam { display:none; }
+    .frag, #last { opacity:1 !important; filter:none !important; }
+    .ember { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="ground"></div>
+  <div id="beam"></div>
+  <div id="embers"></div>
+
+  <span class="frag" data-x="12" data-y="18">footprints in the wreckage, still fresh</span>
+  <span class="frag s" data-x="78" data-y="14">he did this, didn't he</span>
+  <span class="frag" data-x="25" data-y="72">the fire went cold days before anybody showed up</span>
+  <span class="frag" data-x="85" data-y="66">he took the matches when he left</span>
+  <span class="frag" data-x="18" data-y="45">what's left standing wasn't worth saving anyway</span>
+  <span class="frag" data-x="65" data-y="28">every splintered board got a sermon nobody asked for</span>
+  <span class="frag" data-x="40" data-y="85">you can count the smoke, you just can't hold it</span>
+  <span class="frag" data-x="90" data-y="40">the story doesn't need a body, just an audience</span>
+  <span class="frag s" data-x="55" data-y="12">somebody has to answer for this</span>
+  <span class="frag s" data-x="10" data-y="60">we're not here to judge, we just want the truth</span>
+  <span class="frag s" data-x="72" data-y="80">there has to be a body somewhere</span>
+  <span class="frag" data-x="35" data-y="25">there's a circle stamped down in the dirt where they stood</span>
+  <span class="frag s" data-x="60" data-y="65">look what he left behind</span>
+  <span class="frag d" data-x="20" data-y="30">there's nothing under here that belongs to you</span>
+  <span class="frag d" data-x="80" data-y="50">I already took what mattered before you got here</span>
+  <span class="frag d" data-x="45" data-y="15">keep digging, there's nothing left to save</span>
+  <span class="frag d" data-x="30" data-y="55">you can search till the batteries die</span>
+
+  <span id="last">you brought your own light</span>
+</div>
+
+<div id="flash"></div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* embers, indifferent to the reader, always drifting */
+  var emberHost = document.getElementById('embers');
+  if (!reduce) {
+    for (var i = 0; i < 46; i++) {
+      var e = document.createElement('div');
+      e.className = 'ember';
+      e.style.left = (Math.random() * 100) + '%';
+      e.style.setProperty('--dx', (Math.random() * 60 - 30) + 'px');
+      e.style.animationDuration = (7 + Math.random() * 9) + 's';
+      e.style.animationDelay = (Math.random() * 12) + 's';
+      emberHost.appendChild(e);
+    }
+  }
+
+  if (reduce) return;
+
+  var frags = Array.prototype.slice.call(document.querySelectorAll('.frag'));
+  var last = document.getElementById('last');
+  var flash = document.getElementById('flash');
+  var beam = document.getElementById('beam');
+
+  var px = window.innerWidth / 2, py = window.innerHeight / 2;
+  var radius = 230;
+  var lastHeld = 0;
+  var lastFound = false;
+  var lastT = performance.now();
+
+  function setPointer(x, y) {
+    px = x; py = y;
+    document.documentElement.style.setProperty('--mx', x + 'px');
+    document.documentElement.style.setProperty('--my', y + 'px');
+  }
+
+  document.addEventListener('mousemove', function (e) {
+    setPointer(e.clientX, e.clientY);
+  });
+  document.addEventListener('touchmove', function (e) {
+    if (e.touches && e.touches[0]) setPointer(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  document.addEventListener('touchstart', function (e) {
+    if (e.touches && e.touches[0]) setPointer(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+
+  setPointer(px, py);
+
+  function frame(now) {
+    var dt = Math.min(48, now - lastT);
+    lastT = now;
+
+    for (var i = 0; i < frags.length; i++) {
+      var el = frags[i];
+      var x = (+el.getAttribute('data-x') / 100) * window.innerWidth;
+      var y = (+el.getAttribute('data-y') / 100) * window.innerHeight;
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      var d = Math.hypot(px - x, py - y);
+      var o = Math.max(0, 1 - d / radius);
+      el.style.opacity = o.toFixed(2);
+      el.style.filter = 'blur(' + (2 * (1 - o)).toFixed(2) + 'px)';
+    }
+
+    if (!lastFound) {
+      var lx = window.innerWidth / 2, ly = window.innerHeight / 2;
+      var ld = Math.hypot(px - lx, py - ly);
+      if (ld < 140) {
+        lastHeld += dt;
+        if (lastHeld > 1700) {
+          lastFound = true;
+          last.classList.add('found');
+          flash.style.transition = 'opacity 1.2s ease';
+          flash.style.opacity = '0.35';
+          setTimeout(function () {
+            flash.style.transition = 'opacity 3s ease';
+            flash.style.opacity = '0';
+          }, 400);
+        }
+      } else {
+        lastHeld = Math.max(0, lastHeld - dt * 1.5);
+      }
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  window.addEventListener('resize', function () {
+    setPointer(px, py);
+  });
+})();
+</script>
+
+</body>
+</html>

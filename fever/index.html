@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fever</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background:#140f0d;
+    color:#d8cfc0;
+    font-family:'Cormorant Garamond',serif;
+    font-weight:400;
+    min-height:100vh;
+    padding:26vh 0 44vh;
+    overflow-x:hidden;
+  }
+
+  .poem {
+    position:relative;
+    max-width:560px; margin:0 auto; padding:0 34px;
+  }
+
+  .l {
+    display:block;
+    font-size:22px;
+    line-height:1.55;
+    margin-bottom:34px;
+    position:relative;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity 1.1s ease, transform 1.1s ease;
+  }
+  .l.up { opacity:1; transform:none; }
+  .l .t { position:relative; display:inline-block; }
+
+  .l.d {
+    font-style:italic;
+    font-weight:500;
+    color:#c86a4e;
+    transition:opacity 1.9s ease, transform 1.9s ease;
+  }
+
+  .i1 { padding-left:2.6rem; }
+  .i2 { padding-left:5.4rem; }
+  .tight { margin-bottom:12px; }
+  .gap { margin-top:12vh; }
+  .big { font-size:26px; }
+
+  /* ---- the sweat ---- */
+  .drop {
+    position:absolute;
+    width:3px; height:10px;
+    border-radius:40% 40% 55% 55%;
+    pointer-events:none;
+    z-index:4;
+  }
+  .streak {
+    position:absolute;
+    width:1.5px;
+    transform-origin:top center;
+    pointer-events:none;
+    z-index:1;
+    opacity:0.35;
+  }
+  .blot {
+    position:absolute;
+    border-radius:46% 54% 50% 50%;
+    pointer-events:none;
+    z-index:1;
+    opacity:0.28;
+    filter:blur(0.4px);
+  }
+
+  #last { margin-top:14vh; }
+
+  @media (max-width:640px) {
+    .l { font-size:19px; }
+    .big { font-size:22px; }
+    .i1 { padding-left:1.6rem; }
+    .i2 { padding-left:3.2rem; }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    .l { opacity:1 !important; transform:none !important; transition:none; }
+    .drop, .streak, .blot { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="poem" id="poem">
+
+  <span class="l"><span class="t">fever</span></span>
+
+  <span class="l"><span class="t">one thought did it</span></span>
+
+  <span class="l gap"><span class="t">sheets kicked off</span></span>
+
+  <span class="l d i1" data-dwell="1100" data-sweat="1"><span class="t">the back of her neck</span></span>
+
+  <span class="l gap tight"><span class="t">lie still</span></span>
+  <span class="l i1"><span class="t">the way liars do</span></span>
+
+  <span class="l tight"><span class="t">count something</span></span>
+  <span class="l"><span class="t">count anything</span></span>
+
+  <span class="l d i1 tight" data-dwell="1200" data-sweat="1"><span class="t">two syllables</span></span>
+  <span class="l d i2" data-dwell="900" data-sweat="1"><span class="t">I won&rsquo;t say them</span></span>
+
+  <span class="l d i1 tight" data-dwell="900" data-sweat="1"><span class="t">salt</span></span>
+  <span class="l d i1" data-dwell="1100" data-sweat="1"><span class="t">always salt with her</span></span>
+
+  <span class="l gap tight"><span class="t">a drink of water</span></span>
+  <span class="l"><span class="t">that&rsquo;s all this is</span></span>
+
+  <span class="l tight"><span class="t">a man</span></span>
+  <span class="l i1"><span class="t">getting a drink of water</span></span>
+
+  <span class="l gap tight"><span class="t">the glass sweats in my grip</span></span>
+  <span class="l" data-sweat="1"><span class="t">so do I</span></span>
+
+  <span class="l d i1 gap" data-dwell="1200" data-sweat="1"><span class="t">she&rsquo;d be asleep by now</span></span>
+
+  <span class="l d i1" data-dwell="1300" data-sweat="1"><span class="t">one shoulder out of the blanket</span></span>
+
+  <span class="l d i2" data-dwell="1000"><span class="t">or not asleep</span></span>
+
+  <span class="l"><span class="t">back to bed</span></span>
+
+  <span class="l d i2 big" data-dwell="1600" data-sweat="1"><span class="t">or not asleep</span></span>
+
+  <span class="l gap tight" data-sweat="1" data-long="1"><span class="t">the sweat runs</span></span>
+  <span class="l"><span class="t">I let it run</span></span>
+
+  <span class="l"><span class="t">it knows where it&rsquo;s going</span></span>
+
+  <span class="l gap tight"><span class="t">say them</span></span>
+  <span class="l i1 tight"><span class="t">just once</span></span>
+  <span class="l i1"><span class="t">into the pillow</span></span>
+
+  <span class="l"><span class="t">where God keeps no microphones</span></span>
+
+  <span class="l gap"><span class="t">I didn&rsquo;t</span></span>
+
+  <span class="l d i1 big" data-dwell="1700" data-sweat="1"><span class="t">I did</span></span>
+
+  <span class="l gap tight" id="last"><span class="t">by morning the sheets dry</span></span>
+
+  <span class="l"><span class="t">what ran doesn&rsquo;t</span></span>
+
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var lines = Array.prototype.slice.call(document.querySelectorAll('.l'));
+
+  lines.forEach(function (el) {
+    el._need = +(el.getAttribute('data-dwell') || 160);
+    el._held = 0;
+    el._up = false;
+    el._drips = 0;
+    el._next = 1200 + Math.random() * 1500;
+    el._since = 0;
+  });
+
+  if (reduce) {
+    lines.forEach(function (el) { el.classList.add('up'); });
+    return;
+  }
+
+  /* ----------------------------------------------------------------
+     THE SWEAT.
+
+     The hottest lines cannot hold their ink. A letter lets a drop
+     go; it runs down into the poem below, slowing as it goes, and
+     where it stops it stains. The streaks and the stains stay.
+     By the end the page carries a history of everywhere it ran.
+     ---------------------------------------------------------------- */
+  function drip(el) {
+    var t = el.querySelector('.t');
+    if (!t) return;
+    var long = el.hasAttribute('data-long');
+    var color = getComputedStyle(el).color;
+
+    var x = t.offsetLeft + 4 + Math.random() * Math.max(8, t.offsetWidth - 8);
+    var y0 = t.offsetTop + t.offsetHeight - 4;
+    var run = long
+      ? window.innerHeight * (0.45 + Math.random() * 0.15)
+      : 46 + Math.random() * 70;
+    var dur = long ? 8200 : 2400 + Math.random() * 1800;
+    var drift = (Math.random() - 0.5) * 6;
+
+    var streak = document.createElement('i');
+    streak.className = 'streak';
+    streak.style.left = x + 'px';
+    streak.style.top = y0 + 'px';
+    streak.style.height = run + 'px';
+    streak.style.background = 'linear-gradient(to bottom, ' + color + ', transparent 90%)';
+    streak.style.transform = 'scaleY(0)';
+    el.appendChild(streak);
+
+    var drop = document.createElement('i');
+    drop.className = 'drop';
+    drop.style.left = (x - 1.5) + 'px';
+    drop.style.top = y0 + 'px';
+    drop.style.background = color;
+    el.appendChild(drop);
+
+    var ease = 'cubic-bezier(0.3, 0.7, 0.6, 1)';
+    drop.animate(
+      [{ transform: 'translate(0,0)', opacity: 0.85 },
+       { transform: 'translate(' + drift + 'px,' + run + 'px)', opacity: 0.55 }],
+      { duration: dur, easing: ease, fill: 'forwards' }
+    );
+    streak.animate(
+      [{ transform: 'scaleY(0)' }, { transform: 'scaleY(1)' }],
+      { duration: dur, easing: ease, fill: 'forwards' }
+    ).onfinish = function () {
+      streak.style.transform = 'scaleY(1)';
+      streak.style.opacity = 0.16;
+      drop.remove();
+      var blot = document.createElement('i');
+      blot.className = 'blot';
+      var bs = long ? 7 : 4 + Math.random() * 2.5;
+      blot.style.width = bs + 'px';
+      blot.style.height = (bs * 0.8) + 'px';
+      blot.style.left = (x + drift - bs / 2) + 'px';
+      blot.style.top = (y0 + run - 2) + 'px';
+      blot.style.background = color;
+      el.appendChild(blot);
+    };
+  }
+
+  /* dwell reveal, then the sweating begins */
+  var lastT = performance.now();
+  function frame(now) {
+    var dt = now - lastT;
+    lastT = now;
+    var top = window.innerHeight * 0.18;
+    var bot = window.innerHeight * 0.85;
+
+    for (var i = 0; i < lines.length; i++) {
+      var el = lines[i];
+      var r = el.getBoundingClientRect();
+      var mid = r.top + r.height / 2;
+      var inView = mid > -100 && mid < window.innerHeight + 100;
+      var inBand = mid > top && mid < bot;
+
+      if (!el._up) {
+        if (inBand) {
+          el._held += dt;
+          if (el._held >= el._need) {
+            el._up = true;
+            el.classList.add('up');
+          }
+        }
+        continue;
+      }
+
+      if (el.hasAttribute('data-sweat') && inView) {
+        var cap = el.hasAttribute('data-long') ? 1 : 6;
+        if (el._drips < cap) {
+          el._since += dt;
+          if (el._since >= el._next) {
+            el._since = 0;
+            el._next = 2800 + Math.random() * 4200;
+            el._drips++;
+            drip(el);
+          }
+        }
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>

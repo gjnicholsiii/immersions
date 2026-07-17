@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sundress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    /* it starts dark. the blush is what betrays him. */
+    background:#0d0a09;
+    color:#d8cfc0;
+    font-family:'Cormorant Garamond',serif;
+    font-weight:400;
+    min-height:100vh;
+    padding:26vh 0 40vh;
+    overflow-x:hidden;
+  }
+
+  /* heat floods from the edges when it floods at all */
+  #vignette {
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 50%, transparent 44%, rgba(196,48,28,0.42) 100%);
+    opacity:0;
+  }
+
+  /* the heartbeat. the whole flush rides on it. */
+  #throb {
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 58%, rgba(196,55,32,0.5), transparent 70%);
+    opacity:0;
+  }
+
+  .poem {
+    position:relative; z-index:3;
+    max-width:560px; margin:0 auto; padding:0 34px;
+  }
+
+  .l {
+    display:block;
+    font-size:22px;
+    line-height:1.55;
+    margin-bottom:34px;
+    position:relative;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity 1.1s ease, transform 1.1s ease;
+  }
+  .l.up { opacity:1; transform:none; }
+
+  /* the intrusions. they arrive only if you stay. */
+  .l.d {
+    font-style:italic;
+    font-weight:500;
+    color:#d6795c;
+    transition:opacity 1.9s ease, transform 1.9s ease;
+  }
+
+  /* the scolds. cold, and losing. */
+  .l.s {
+    color:#8b9297;
+    letter-spacing:0.04em;
+  }
+
+  /* residue: the heat that stays behind the worst lines */
+  .l .bloom {
+    position:absolute;
+    left:-14%; right:-14%; top:-160%; bottom:-160%;
+    z-index:-1;
+    background:radial-gradient(ellipse at 40% 50%, rgba(206,64,38,0.34), transparent 65%);
+    filter:blur(10px);
+    opacity:0;
+    transition:opacity 2.6s ease;
+  }
+  .l.up .bloom { opacity:1; }
+
+  .i1 { padding-left:2.6rem; }
+  .i2 { padding-left:5.4rem; }
+  .tight { margin-bottom:12px; }
+  .gap { margin-top:12vh; }
+  .big { font-size:26px; }
+
+  #amen {
+    text-align:center;
+    padding-left:0;
+    margin-top:16vh;
+    font-size:20px;
+    letter-spacing:0.12em;
+  }
+
+  @media (max-width:640px) {
+    .l { font-size:19px; }
+    .big { font-size:22px; }
+    .i1 { padding-left:1.6rem; }
+    .i2 { padding-left:3.2rem; }
+  }
+
+  @media (prefers-reduced-motion:reduce) {
+    .l { opacity:1 !important; transform:none !important; transition:none; }
+    .l .bloom { opacity:1 !important; transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="throb"></div>
+<div id="vignette"></div>
+
+<div class="poem" id="poem">
+
+  <span class="l" data-h="0.01">trash run</span>
+
+  <span class="l gap" data-h="0.01">she gardens in a sundress</span>
+
+  <span class="l" data-h="0.01">nobody gardens in a sundress</span>
+
+  <span class="l tight" data-h="0.01">god</span>
+  <span class="l i1" data-h="0.02">let her garden in a sundress</span>
+
+  <span class="l gap" data-h="0.01">the hem</span>
+
+  <span class="l" data-h="0.01">the far weeds</span>
+
+  <span class="l tight" data-h="0.02">she reaches</span>
+  <span class="l i1" data-h="0.02">it rides</span>
+
+  <span class="l" data-h="0.02">those legs</span>
+
+  <span class="l d i1" data-h="0.07" data-dwell="900"><span class="bloom"></span>those thighs</span>
+
+  <span class="l gap" data-h="0.03">then she bent</span>
+
+  <span class="l" data-h="0.03">I looked</span>
+
+  <span class="l d i1 big" data-h="0.12" data-dwell="1400"><span class="bloom"></span>my hands on that thigh</span>
+
+  <span class="l d i2" data-h="0.06" data-dwell="900"><span class="bloom"></span>both of them</span>
+
+  <span class="l gap" data-h="0">where did that come from</span>
+
+  <span class="l" data-h="0.02">it came from me</span>
+
+  <span class="l d i1 tight" data-h="0.05" data-dwell="900">salt</span>
+
+  <span class="l d i1" data-h="0.08" data-dwell="1100"><span class="bloom"></span>she&rsquo;d taste of salt</span>
+
+  <span class="l tight" data-h="0.04">mouth watering</span>
+  <span class="l i1" data-h="0.02">over another man&rsquo;s garden</span>
+
+  <span class="l gap tight" data-h="0.03">filed it</span>
+  <span class="l i1" data-h="0.02">somewhere the sermons don&rsquo;t reach</span>
+
+  <span class="l gap" data-h="0.01">first look is free</span>
+
+  <span class="l" data-h="0.02">says every man who wanted a second</span>
+
+  <span class="l gap" data-h="0.01">she waved</span>
+
+  <span class="l tight" data-h="0.01">dirt on the glove</span>
+  <span class="l" data-h="0.02">hair stuck to her neck</span>
+
+  <span class="l" data-h="0.01">I waved back</span>
+
+  <span class="l d i1 big" data-h="0.12" data-dwell="1800"><span class="bloom"></span>with the same hand I</span>
+
+  <span class="l gap" data-h="0.01">recycling</span>
+
+  <span class="l" data-h="0.02">smooth as a pew</span>
+
+  <span class="l s gap" data-h="-0.04">enough</span>
+
+  <span class="l d i1" data-h="0.08" data-dwell="1100"><span class="bloom"></span>the heat coming off her skin</span>
+
+  <span class="l s" data-h="-0.04">you have a wife</span>
+
+  <span class="l d i2 tight" data-h="0.05" data-dwell="800">salt</span>
+
+  <span class="l d i1" data-h="0.06" data-dwell="1000">someone&rsquo;s watching you</span>
+
+  <span class="l d i1 tight" data-h="0.04" data-dwell="1000"><span class="bloom"></span>the sound she&rsquo;d make</span>
+  <span class="l d i2 tight" data-h="0.06" data-dwell="1100"><span class="bloom"></span>moan</span>
+  <span class="l d i2" data-h="0.03" data-dwell="700">surprised</span>
+
+  <span class="l s" data-h="-0.04">stop</span>
+
+  <span class="l d i1" data-h="0.08" data-dwell="1100"><span class="bloom"></span>warm through the cotton</span>
+
+  <span class="l s" data-h="-0.04">you are better than this</span>
+
+  <span class="l" data-h="0.04">I am not</span>
+
+  <span class="l d i1 tight gap" data-h="0.05" data-dwell="1300"><span class="bloom"></span>what if she thinks of me</span>
+  <span class="l d i2 tight" data-h="0.04" data-dwell="900">at her own window</span>
+  <span class="l d i2 big" data-h="0.05" data-dwell="1500"><span class="bloom"></span>fingers</span>
+
+  <span class="l d i1 gap tight" data-h="0.05" data-dwell="1000">her breath</span>
+
+  <span class="l d i2" data-h="0.06" data-dwell="1200"><span class="bloom"></span>her breath</span>
+
+  <span class="l" id="amen" data-h="0.02">amen</span>
+
+</div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var lines = Array.prototype.slice.call(document.querySelectorAll('.l'));
+  var vignette = document.getElementById('vignette');
+  var throb = document.getElementById('throb');
+  var body = document.body;
+
+  /* dark: composed -> flushed -> burning */
+  var SKIN = [
+    { h: 0.0, c: [13, 10, 9] },
+    { h: 0.4, c: [45, 15, 12] },
+    { h: 0.7, c: [82, 23, 17] },
+    { h: 1.0, c: [117, 32, 23] }
+  ];
+  function skin(h) {
+    var i = 0;
+    while (i < SKIN.length - 2 && h > SKIN[i + 1].h) i++;
+    var a = SKIN[i], b = SKIN[i + 1];
+    var t = Math.max(0, Math.min(1, (h - a.h) / (b.h - a.h)));
+    return 'rgb(' + a.c.map(function (v, k) {
+      return Math.round(v + (b.c[k] - v) * t);
+    }).join(',') + ')';
+  }
+
+  if (reduce) {
+    body.style.background = skin(0.7);
+    vignette.style.opacity = 0.5;
+    return;
+  }
+
+  /* ----------------------------------------------------------------
+     THE HEARTBEAT.
+
+     The flush does not sit still. It rides a pulse: a lub, a dub,
+     the space between. Resting rate while the page is composed.
+     The hotter the page, the faster the heart.
+     ---------------------------------------------------------------- */
+  function bump(x, at, w) {
+    var d = (x - at) / w;
+    return Math.exp(-d * d);
+  }
+  function heartbeat(t, h) {
+    var bpm = 52 + h * 38;
+    var phase = (t * bpm / 60) % 1;
+    return bump(phase, 0.10, 0.05) + 0.55 * bump(phase, 0.30, 0.055);
+  }
+
+  /* ----------------------------------------------------------------
+     THE RATCHET.
+
+     Desire surges the heat. Shame argues it back down. But heat has
+     a floor, and every surge raises the floor, so the scolds work
+     less each time. The page can flush further. It cannot compose
+     itself again.
+     ---------------------------------------------------------------- */
+  var heat = 0;        /* rendered */
+  var target = 0;      /* argued over */
+  var floor = 0;       /* what shame can no longer undo */
+
+  function apply(h) {
+    if (h >= 0) {
+      target = Math.min(1, target + h);
+      floor = Math.max(floor, target * 0.86);
+    } else {
+      target = Math.max(floor, target + h);
+    }
+  }
+
+  /* ----------------------------------------------------------------
+     THE DWELL.
+
+     Roman lines surface almost at once. The italics are intrusions:
+     they only arrive if the reader stays with the poem, unguarded.
+     A skimmer scrolls a pale page of chores and scolds and never
+     learns what visited the man between the lines.
+     ---------------------------------------------------------------- */
+  lines.forEach(function (el) {
+    el._need = +(el.getAttribute('data-dwell') || 160);
+    el._held = 0;
+    el._h = +(el.getAttribute('data-h') || 0);
+    el._up = false;
+  });
+
+  var lastT = performance.now();
+  function frame(now) {
+    var dt = now - lastT;
+    lastT = now;
+
+    var top = window.innerHeight * 0.18;
+    var bot = window.innerHeight * 0.85;
+
+    for (var i = 0; i < lines.length; i++) {
+      var el = lines[i];
+      if (el._up) continue;
+      var r = el.getBoundingClientRect();
+      var mid = r.top + r.height / 2;
+      if (mid > top && mid < bot) {
+        el._held += dt;
+        if (el._held >= el._need) {
+          el._up = true;
+          el.classList.add('up');
+          apply(el._h);
+        }
+      }
+    }
+
+    heat += (target - heat) * 0.02;
+    var beat = heartbeat(now / 1000, heat);
+    var flush = Math.min(1, heat * (1 + 0.16 * beat));
+    body.style.background = skin(flush);
+    vignette.style.opacity = (heat * 0.6 * (0.75 + 0.45 * beat)).toFixed(3);
+    throb.style.opacity = (heat * 0.30 * beat).toFixed(3);
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
