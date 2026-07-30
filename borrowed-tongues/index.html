@@ -1,1 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Borrowed Tongues</title>
+<style>
+  :root {
+    --bg: #060504;
+    --bg2: #0e0b08;
+    --gold: #d4ae72;
+    --gold-soft: rgba(212, 174, 114, 0.66);
+    --ivory: #f5ead6;
+    --text: rgba(245, 234, 214, 0.92);
+    --muted: rgba(224, 201, 166, 0.72);
+    --line: rgba(212, 174, 114, 0.22);
+    --shadow: rgba(0, 0, 0, 0.45);
+    --active: rgba(255, 220, 164, 0.98);
+  }
 
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    color: var(--text);
+    font-family: Georgia, "Times New Roman", serif;
+    background:
+      radial-gradient(circle at 18% 18%, rgba(172, 108, 42, 0.13), transparent 28%),
+      radial-gradient(circle at 82% 12%, rgba(139, 79, 28, 0.08), transparent 24%),
+      radial-gradient(circle at 50% 88%, rgba(255, 214, 153, 0.05), transparent 20%),
+      linear-gradient(180deg, var(--bg2), var(--bg));
+    overflow: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 31px, rgba(255,255,255,0.014) 32px, transparent 33px 64px),
+      radial-gradient(circle at center, transparent 0%, transparent 68%, rgba(255,255,255,0.02) 100%);
+    opacity: 0.42;
+    mix-blend-mode: screen;
+  }
+
+  .grain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.055;
+    background-image: radial-gradient(rgba(255,255,255,0.75) 0.6px, transparent 0.6px);
+    background-size: 7px 7px;
+    mix-blend-mode: screen;
+  }
+
+  .gate {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    background: rgba(4, 4, 4, 0.96);
+    transition: opacity 0.9s ease, visibility 0.9s ease;
+  }
+  .gate.hidden { opacity: 0; visibility: hidden; }
+  .gate-card {
+    text-align: center;
+    padding: 32px 26px;
+  }
+  .gate-title {
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+  .gate-sub {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 1.18rem;
+    margin-bottom: 22px;
+  }
+  .begin {
+    appearance: none;
+    border: 1px solid rgba(212, 174, 114, 0.46);
+    background: transparent;
+    color: var(--gold);
+    border-radius: 999px;
+    padding: 16px 26px;
+    min-width: 150px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-size: 0.86rem;
+    cursor: pointer;
+  }
+
+  .app {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(340px, 1.05fr) minmax(360px, 0.95fr);
+  }
+
+  .left {
+    position: relative;
+    padding: 42px 38px 56px 52px;
+    border-right: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .sigil {
+    position: absolute;
+    top: 26px;
+    left: 16px;
+    width: 34px;
+    height: 110px;
+    opacity: 0.86;
+  }
+  .sigil::before,
+  .sigil::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    border: 1px solid rgba(212,174,114,0.72);
+  }
+  .sigil::before { top: 2px; width: 14px; height: 14px; }
+  .sigil::after { top: 24px; width: 26px; height: 26px; }
+  .sigil span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 52px;
+    width: 1px;
+    height: 58px;
+    background: rgba(212,174,114,0.82);
+  }
+
+  .heading {
+    padding-left: 40px;
+  }
+  .heading h1 {
+    margin: 0;
+    color: var(--gold);
+    font-weight: 400;
+    font-size: clamp(2rem, 2.2vw + 1rem, 3rem);
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+  }
+  .heading .sub {
+    margin-top: 9px;
+    color: var(--muted);
+    font-style: italic;
+    font-size: clamp(1rem, 1vw + 0.7rem, 1.35rem);
+  }
+
+  .stage-wrap {
+    position: absolute;
+    inset: 150px 38px 80px 46px;
+    display: grid;
+    place-items: center;
+  }
+
+  .halo {
+    position: absolute;
+    inset: 8% 10%;
+    border-radius: 50%;
+    border: 1px solid rgba(212,174,114,0.13);
+    transform: rotate(-8deg) scaleX(1.12) scaleY(0.72);
+    box-shadow: 0 0 46px rgba(212,174,114,0.1);
+  }
+  .halo::before,
+  .halo::after {
+    content: "";
+    position: absolute;
+    inset: 6% 8%;
+    border-radius: 50%;
+    border: 1px solid rgba(212,174,114,0.1);
+  }
+  .halo::before { transform: rotate(32deg) scaleX(1.18) scaleY(0.66); }
+  .halo::after { transform: rotate(-26deg) scaleX(0.82) scaleY(1.04); }
+
+  .spark-field {
+    position: absolute;
+    inset: 4% 6%;
+    pointer-events: none;
+  }
+  .spark {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: rgba(240, 198, 128, 0.95);
+    box-shadow: 0 0 14px rgba(240,198,128,0.7);
+    animation: flicker 3.2s ease-in-out infinite;
+  }
+  @keyframes flicker {
+    0%, 100% { opacity: 0.2; transform: translateY(0) scale(0.7); }
+    50% { opacity: 1; transform: translateY(-8px) scale(1.5); }
+  }
+
+  .poem-stage {
+    position: relative;
+    width: min(92%, 760px);
+    height: min(72vh, 780px);
+    min-height: 360px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ghosts {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ghost-line {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(88%, 610px);
+    text-align: center;
+    transform: translate(-50%, -50%);
+    color: rgba(244, 230, 206, 0.88);
+    font-size: clamp(1.05rem, 0.75vw + 0.95rem, 1.45rem);
+    line-height: 1.45;
+    text-shadow: 0 0 22px rgba(255, 220, 164, 0.09);
+    opacity: 0;
+    filter: blur(4px);
+    will-change: transform, opacity, filter;
+  }
+  .ghost-line.active {
+    animation: linePass 6.2s cubic-bezier(0.16, 0.8, 0.2, 1) forwards;
+  }
+  .ghost-line.accent {
+    color: var(--active);
+    text-shadow: 0 0 26px rgba(255, 219, 153, 0.18), 0 0 52px rgba(195, 139, 70, 0.12);
+  }
+  @keyframes linePass {
+    0% {
+      opacity: 0;
+      filter: blur(14px);
+      transform: translate(-50%, calc(-50% + 24px)) scale(0.96);
+    }
+    16% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(-50%, -50%) scale(1);
+    }
+    62% {
+      opacity: 1;
+      filter: blur(0);
+      transform: translate(-50%, calc(-50% - 10px)) scale(1.006);
+    }
+    100% {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translate(-50%, calc(-50% - 72px)) scale(0.985);
+    }
+  }
+
+  .transport {
+    position: absolute;
+    left: 52px;
+    bottom: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(212,174,114,0.82);
+  }
+  .transport button {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(212,174,114,0.34);
+    background: rgba(10,9,8,0.92);
+    color: inherit;
+    cursor: pointer;
+  }
+  .progress {
+    width: 140px;
+    height: 1px;
+    background: rgba(212,174,114,0.2);
+    overflow: hidden;
+  }
+  .progress span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(212,174,114,0.42), rgba(246,226,191,0.96));
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  .right {
+    position: relative;
+    padding: 36px 32px 32px 28px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .archive-head {
+    text-align: center;
+    color: var(--gold);
+    font-style: italic;
+    font-size: clamp(1.2rem, 0.8vw + 0.9rem, 1.6rem);
+  }
+  .archive-head::after {
+    content: "";
+    display: block;
+    width: min(240px, 56%);
+    height: 1px;
+    margin: 14px auto 0;
+    background: linear-gradient(90deg, transparent, rgba(212,174,114,0.58), transparent);
+  }
+
+  .poem-archive {
+    flex: 1;
+    min-height: 0;
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(8,8,8,0.74), rgba(8,8,8,0.44));
+    padding: 26px 24px 24px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(212,174,114,0.28) transparent;
+  }
+  .poem-archive::-webkit-scrollbar { width: 7px; }
+  .poem-archive::-webkit-scrollbar-thumb { background: rgba(212,174,114,0.28); border-radius: 999px; }
+
+  .archive-line {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+    font-size: clamp(1rem, 0.55vw + 0.9rem, 1.2rem);
+    line-height: 1.55;
+    margin: 0 0 0.25rem;
+    white-space: pre-wrap;
+  }
+  .archive-line.revealed {
+    animation: archiveReveal 0.7s ease forwards;
+  }
+  @keyframes archiveReveal {
+    from { opacity: 0; transform: translateY(14px); filter: blur(4px); }
+    to { opacity: 1; transform: translateY(0); filter: blur(0); }
+  }
+
+  .archive-break {
+    height: 1.15rem;
+  }
+
+  .archive-line.foreign {
+    color: var(--active);
+    text-shadow: 0 0 18px rgba(255, 218, 153, 0.12);
+  }
+
+  .footer {
+    text-align: center;
+    color: var(--gold);
+    font-style: italic;
+    font-size: clamp(1.12rem, 0.7vw + 0.8rem, 1.45rem);
+    margin-top: 16px;
+  }
+  .footer::before,
+  .footer::after {
+    content: "";
+    display: inline-block;
+    width: 70px;
+    height: 1px;
+    margin: 0 16px 5px;
+    background: linear-gradient(90deg, transparent, rgba(212,174,114,0.42));
+    vertical-align: middle;
+  }
+  .footer::after {
+    background: linear-gradient(90deg, rgba(212,174,114,0.42), transparent);
+  }
+
+  .status {
+    position: absolute;
+    top: 18px;
+    right: 26px;
+    color: rgba(245,234,214,0.64);
+    font-size: 0.92rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .status.show { opacity: 1; }
+
+  .audio-error {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    color: rgba(245,234,214,0.72);
+    font-size: 0.86rem;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 55;
+  }
+  .audio-error.visible { opacity: 1; }
+
+  @media (max-width: 1050px) {
+    body { overflow: auto; }
+    .app {
+      height: auto;
+      min-height: 100vh;
+      grid-template-columns: 1fr;
+    }
+    .left {
+      min-height: 100vh;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .right {
+      min-height: 100vh;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .left { padding: 28px 16px 76px 20px; }
+    .sigil { left: 2px; top: 14px; transform: scale(0.82); transform-origin: top left; }
+    .heading { padding-left: 28px; }
+    .stage-wrap { inset: 130px 12px 78px 12px; }
+    .ghost-line { width: 96%; font-size: 1rem; }
+    .transport { left: 18px; }
+    .progress { width: 92px; }
+    .right { padding: 22px 14px 20px; }
+    .poem-archive { padding: 20px 16px 18px; }
+    .footer::before, .footer::after { width: 32px; margin: 0 10px 5px; }
+  }
+</style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <div class="gate" id="gate">
+    <div class="gate-card">
+      <div class="gate-title">Borrowed Tongues</div>
+      <div class="gate-sub">the poem in motion</div>
+      <button class="begin" id="beginButton" type="button">Begin</button>
+    </div>
+  </div>
+
+  <div class="audio-error" id="audioError">Audio could not be started automatically.</div>
+  <audio id="score" src="Five Note Orbit.mp3" preload="auto" playsinline></audio>
+
+  <div class="app">
+    <section class="left">
+      <div class="sigil"><span></span></div>
+      <div class="heading">
+        <h1>Borrowed Tongues</h1>
+        <div class="sub">a poem of desire in five languages</div>
+      </div>
+
+      <div class="stage-wrap">
+        <div class="poem-stage">
+          <div class="halo"></div>
+          <div class="spark-field" id="sparkField"></div>
+          <div class="ghosts" id="ghosts"></div>
+        </div>
+      </div>
+
+      <div class="transport">
+        <button id="playPause" type="button" aria-label="Pause">Ⅱ</button>
+        <div class="progress"><span id="progressFill"></span></div>
+        <button id="restart" type="button" aria-label="Restart">↺</button>
+      </div>
+    </section>
+
+    <section class="right">
+      <div class="archive-head">the completed poem</div>
+      <div class="status" id="status">poem complete</div>
+      <div class="poem-archive" id="archive"></div>
+      <div class="footer">five tongues. one desire.</div>
+    </section>
+  </div>
+
+<script>
+(function(){
+  const poem = [
+    "I want to watch you glide across a crowded room,",
+    "the deliberate placement of each step,",
+    "the way you draw every eye without trying.",
+    "Da mi basia mille, give me a thousand kisses,",
+    "wrote Catullus to his Lesbia, as if he too",
+    "had witnessed how you turn your head when listening,",
+    "how your fingers trace the rim of your glass,",
+    "warmth the sole evidence of touch.",
+    "",
+    "I want to follow the curve where your shoulders begin,",
+    "the shadowed inlet where your heart flutters beneath flesh,",
+    "that hollow meant for whispers and salt.",
+    "Glukupikron amachanon orpeton,  sweetbitter, impossible to fight,",
+    "Sappho scribed this centuries ago, knowing how",
+    " you would linger on my clothes,",
+    "how your laugh would sing to me",
+    "later when I'm alone.",
+    "",
+    "I want to taste the heat of your skin after sleep,",
+    "to trace with tongue the paths my fingers discover,",
+    "to find where patience dissolves into urgency.",
+    "Surata samavesha, the joining of bodies,",
+    "sung in Vatsyayana's verses, as if he understood",
+    "how your back would arch beneath my hands,",
+    "how time calms itself when hips meet hips,",
+    "how breath becomes both question and answer.",
+    "",
+    "I want to witness your unraveling,",
+    "to witness the sounds that escape when control is lost,",
+    "to become the cause of your undoing.",
+    "ﻛﻤﺎ ﻳﺬﻭﺏ ﺍﻟﻤﻠﺢ ﻓﻲ ﺍﻟﻤﺎﺀ,  as salt dissolves in water,",
+    "Ibn Hazm described the soul's dissolution in pleasure,",
+    "as if he had seen how your eyes close just before release,",
+    "how your fingers dig half-moons into my skin,",
+    "how you become utterly unconcerned with what's spoken.",
+    "",
+    "I want to inhabit the silence ,",
+    "when bodies cool and thoughts resurface,",
+    "when fingers trace idle patterns on damp skin.",
+    "物の哀れ,  mono no aware, the pathos of things,",
+    "this brief, exquisite impermanence that the Japanese poets",
+    "understood when writing of fleeting beauty,",
+    "knowing how your profile against the pillow",
+    "would become memory even as I witness it.",
+    "",
+    "These words are not mine alone. I translate",
+    "what bodies have spoken for millennia,",
+    "borrowing phrases from dead tongues",
+    "to say what feels so urgently present.",
+    "When I trace desires across your skin,",
+    "I write in things invented before my birth;",
+    "when you respond with sighs and movements,",
+    "you speak a language older still.",
+    "",
+    "Our wants echo through papyrus and stone,",
+    "through songs and fragments that survived collapse.",
+    "The ancients would recognize us immediately",
+    "how little the body's hungers have changed,",
+    "how consistent its vocabulary of pleasure.",
+    "So when I say I want you, I speak with the voice",
+    "of thousands before me, adding our verse",
+    "to this never-completed poem of desire."
+];
+
+  const ghosts = document.getElementById('ghosts');
+  const archive = document.getElementById('archive');
+  const gate = document.getElementById('gate');
+  const beginButton = document.getElementById('beginButton');
+  const audio = document.getElementById('score');
+  const audioError = document.getElementById('audioError');
+  const playPause = document.getElementById('playPause');
+  const restart = document.getElementById('restart');
+  const progressFill = document.getElementById('progressFill');
+  const status = document.getElementById('status');
+  const sparkField = document.getElementById('sparkField');
+
+  let timeline = [];
+  let nextIndex = 0;
+  let started = false;
+  let raf = 0;
+
+  function isForeign(line) {
+    return /Da mi basia mille|Glukupikron|Surata samavesha|ﻛﻤﺎ ﻳﺬﻭﺏ|物の哀れ/.test(line);
+  }
+
+  function buildSparks() {
+    sparkField.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+      const spark = document.createElement('span');
+      spark.className = 'spark';
+      spark.style.left = (6 + Math.random() * 88) + '%';
+      spark.style.top = (6 + Math.random() * 84) + '%';
+      spark.style.animationDelay = (Math.random() * 2.8) + 's';
+      spark.style.opacity = 0.15 + Math.random() * 0.7;
+      sparkField.appendChild(spark);
+    }
+  }
+
+  function computeTimeline() {
+    const duration = Number.isFinite(audio.duration) && audio.duration > 10 ? audio.duration : 249.768;
+    const weights = poem.map(line => {
+      if (line === '') return 1.45;
+      let w = 2.3 + Math.min(line.length / 40, 2.2);
+      if (isForeign(line)) w += 1.1;
+      if (/never-completed poem of desire\.$/.test(line)) w += 1.6;
+      return w;
+    });
+
+    const total = weights.reduce((a,b) => a+b, 0);
+    const usable = Math.max(24, duration - 12);
+    let cursor = 4.5;
+    timeline = poem.map((line, i) => {
+      const span = usable * (weights[i] / total);
+      const cue = cursor;
+      cursor += span;
+      return { line, cue };
+    });
+  }
+
+  function revealArchiveLine(index) {
+    const line = poem[index];
+    if (line === '') {
+      const spacer = document.createElement('div');
+      spacer.className = 'archive-break';
+      archive.appendChild(spacer);
+    } else {
+      const el = document.createElement('div');
+      el.className = 'archive-line';
+      if (isForeign(line)) el.classList.add('foreign');
+      el.textContent = line;
+      archive.appendChild(el);
+      requestAnimationFrame(() => el.classList.add('revealed'));
+    }
+    archive.scrollTop = archive.scrollHeight;
+  }
+
+  function spawnGhost(line) {
+    if (line === '') return;
+    const el = document.createElement('div');
+    el.className = 'ghost-line';
+    if (isForeign(line)) el.classList.add('accent');
+    el.textContent = line;
+    ghosts.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('active'));
+    setTimeout(() => el.remove(), 6600);
+  }
+
+  function updateTimeline() {
+    if (!started) return;
+    const time = audio.currentTime || 0;
+    while (nextIndex < timeline.length && time >= timeline[nextIndex].cue) {
+      spawnGhost(timeline[nextIndex].line);
+      revealArchiveLine(nextIndex);
+      nextIndex += 1;
+      if (nextIndex >= timeline.length) {
+        status.classList.add('show');
+      }
+    }
+
+    if (audio.duration) {
+      progressFill.style.transform = `scaleX(${Math.min(1, audio.currentTime / audio.duration)})`;
+    }
+    playPause.textContent = audio.paused ? '▶' : 'Ⅱ';
+    raf = requestAnimationFrame(updateTimeline);
+  }
+
+  function begin() {
+    if (started) return;
+    started = true;
+    gate.classList.add('hidden');
+    const p = audio.play();
+    if (p && typeof p.catch === 'function') {
+      p.catch(() => audioError.classList.add('visible'));
+    }
+    cancelAnimationFrame(raf);
+    updateTimeline();
+  }
+
+  function toggleAudio() {
+    if (!started) begin();
+    if (audio.paused) {
+      audio.play().catch(() => audioError.classList.add('visible'));
+    } else {
+      audio.pause();
+    }
+  }
+
+  function clearExperience() {
+    ghosts.innerHTML = '';
+    archive.innerHTML = '';
+    nextIndex = 0;
+    status.classList.remove('show');
+    progressFill.style.transform = 'scaleX(0)';
+  }
+
+  function restartExperience() {
+    clearExperience();
+    audio.currentTime = 0;
+    if (!started) return;
+    audio.play().catch(() => audioError.classList.add('visible'));
+  }
+
+  beginButton.addEventListener('click', begin);
+  playPause.addEventListener('click', toggleAudio);
+  restart.addEventListener('click', restartExperience);
+  audio.addEventListener('loadedmetadata', computeTimeline, { once: true });
+  audio.addEventListener('ended', () => playPause.textContent = '▶');
+  audio.addEventListener('pause', () => playPause.textContent = '▶');
+  audio.addEventListener('playing', () => playPause.textContent = 'Ⅱ');
+
+  computeTimeline();
+  buildSparks();
+})();
+</script>
+</body>
+</html>
