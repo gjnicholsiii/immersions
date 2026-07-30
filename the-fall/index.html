@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090807">
+<title>The Fall — A Bastard Saint Immersion</title>
+<style>
+  :root{
+    --paper:#0b0908;
+    --ink:#d9c7b7;
+    --warm:#f2b486;
+    --heat:0;
+    --music:0;
+    --light:0;
+    --veil:1;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:auto;background:#090807;scrollbar-width:none;}
+  html::-webkit-scrollbar,body::-webkit-scrollbar{display:none;width:0;height:0;}
+  body{
+    margin:0;
+    min-height:100vh;
+    overflow-x:hidden;
+    background:
+      radial-gradient(ellipse at 50% 42%, rgba(139,61,33,calc(.035 + var(--heat) * .16)), transparent 44%),
+      radial-gradient(ellipse at 50% 11%, rgba(69,36,27,.26), transparent 43%),
+      linear-gradient(180deg,#0d0a09 0%,#090807 56%,#0b0908 100%);
+    color:var(--ink);
+    overscroll-behavior:none;
+  }
+
+  body.started{
+    cursor:none;
+  }
+
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    opacity:.21;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.32'/%3E%3C/svg%3E");
+    mix-blend-mode:soft-light;
+  }
+
+  body::after{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 50% 48%, rgba(255,149,84,calc(var(--light) * .12)), transparent 36%),
+      linear-gradient(90deg,rgba(0,0,0,.46),transparent 16%,transparent 84%,rgba(0,0,0,.46));
+    transition:background 300ms linear;
+  }
+
+  #surface{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:2;
+    pointer-events:none;
+  }
+
+  .experience{
+    position:relative;
+    z-index:3;
+    max-width:760px;
+    margin:0 auto;
+    padding:46vh clamp(1.15rem,4vw,2rem) 42vh;
+  }
+
+  .chapter{
+    position:relative;
+    min-height:36vh;
+    margin:0 auto 22vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+  }
+
+  .intro{
+    min-height:42vh;
+    margin-bottom:28vh;
+    flex-direction:column;
+  }
+
+  .intro-title{
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-size:clamp(1rem,2vw,1.18rem);
+    font-weight:400;
+    letter-spacing:.52em;
+    text-transform:uppercase;
+    color:#c4b6aa;
+    opacity:0;
+    transform:translateY(-68vh);
+    filter:blur(10px);
+  }
+
+  .intro-title.landed{
+    animation:titleFall 2.2s cubic-bezier(.12,.75,.18,1.12) forwards;
+  }
+
+  .intro-mark{
+    margin-top:1.25rem;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:.58rem;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:#8f8279;
+    opacity:0;
+    transition:opacity 1.8s ease;
+  }
+
+  .intro-mark.visible{opacity:.5;}
+
+  @keyframes titleFall{
+    0%{opacity:0;transform:translateY(-68vh);filter:blur(12px);letter-spacing:.70em;}
+    63%{opacity:.92;transform:translateY(9px);filter:blur(1px);}
+    78%{transform:translateY(-3px);}
+    100%{opacity:.68;transform:translateY(0);filter:blur(0);letter-spacing:.52em;}
+  }
+
+  .stanza{
+    max-width:610px;
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-size:var(--size,clamp(1.05rem,2.6vw,1.33rem));
+    line-height:1.92;
+    font-weight:400;
+    color:#c8b8aa;
+  }
+
+  .stanza[data-depth="1"]{--size:clamp(1rem,2.45vw,1.2rem);--tone:#aaa39c;--weight:300;--tracking:.055em;}
+  .stanza[data-depth="2"]{--size:clamp(1.04rem,2.6vw,1.26rem);--tone:#c0ad9d;--weight:400;--tracking:.025em;}
+  .stanza[data-depth="3"]{--size:clamp(1.08rem,2.8vw,1.36rem);--tone:#d0b29c;--weight:500;--tracking:.012em;}
+  .stanza[data-depth="4"]{--size:clamp(1.14rem,3vw,1.46rem);--tone:#e0a983;--weight:600;--tracking:0em;}
+  .stanza[data-depth="5"]{--size:clamp(1.18rem,3.2vw,1.56rem);--tone:#efb589;--weight:700;--tracking:-.012em;}
+
+  .word,.glyph{
+    display:inline-block;
+    position:relative;
+    vertical-align:baseline;
+  }
+
+  .word{
+    white-space:nowrap;
+    font-size:inherit;
+    margin-right:.42em;
+  }
+
+  .word:last-child{margin-right:0;}
+
+  .glyph{
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-size:var(--size);
+    font-weight:var(--weight);
+    letter-spacing:var(--tracking);
+    color:var(--tone);
+    opacity:0;
+    filter:blur(8px);
+    transform:translate3d(var(--x0),var(--y0),0) rotate(var(--r0));
+    will-change:transform,opacity,filter,text-shadow;
+  }
+
+  .glyph.settled{
+    opacity:1;
+    filter:blur(0);
+    transform:translate3d(0,0,0) rotate(0deg);
+    text-shadow:0 0 11px rgba(255,179,125,.08);
+    will-change:auto;
+  }
+
+  .rapture{
+    min-height:70vh;
+    margin:4vh auto 24vh;
+    flex-direction:column;
+    overflow:visible;
+  }
+
+  .rapture-pre,.rapture-after{
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-style:italic;
+    color:#e7b895;
+    opacity:0;
+  }
+
+  .rapture-pre{
+    font-size:clamp(1.5rem,4vw,2.15rem);
+    transform:translateY(-38vh);
+    filter:blur(10px);
+  }
+
+  .rapture-word{
+    margin:.55rem 0 .65rem;
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:clamp(3rem,11vw,6.8rem);
+    letter-spacing:-.05em;
+    color:#ffd0a8;
+    opacity:0;
+    transform:translateY(-110vh) scale(.90);
+    filter:blur(15px);
+    text-shadow:0 0 0 rgba(255,133,52,0);
+  }
+
+  .rapture-after{
+    max-width:540px;
+    font-size:clamp(1.35rem,3.6vw,1.95rem);
+    line-height:1.4;
+    transform:translateY(-24vh);
+    filter:blur(8px);
+  }
+
+  .rapture.pre-in .rapture-pre{
+    animation:rapturePre 1.5s cubic-bezier(.13,.78,.16,1.08) forwards;
+  }
+
+  .rapture.impact .rapture-word{
+    animation:raptureImpact .92s cubic-bezier(.08,.82,.18,1.16) forwards;
+  }
+
+  .rapture.after-in .rapture-after{
+    animation:raptureAfter 2.8s cubic-bezier(.15,.72,.17,1.05) forwards;
+  }
+
+  @keyframes rapturePre{
+    0%{opacity:0;transform:translateY(-38vh);filter:blur(10px);}
+    74%{opacity:.92;transform:translateY(5px);filter:blur(.8px);}
+    100%{opacity:.83;transform:translateY(0);filter:blur(0);}
+  }
+
+  @keyframes raptureImpact{
+    0%{opacity:0;transform:translateY(-110vh) scale(.90);filter:blur(15px);text-shadow:0 0 0 rgba(255,133,52,0);}
+    72%{opacity:1;transform:translateY(14px) scale(1.025);filter:blur(.5px);text-shadow:0 0 70px rgba(255,133,52,.78);}
+    86%{transform:translateY(-5px) scale(.99);}
+    100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0);text-shadow:0 0 52px rgba(255,133,52,.50);}
+  }
+
+  @keyframes raptureAfter{
+    0%{opacity:0;transform:translateY(-24vh);filter:blur(8px);}
+    72%{opacity:.96;transform:translateY(5px);filter:blur(.8px);}
+    100%{opacity:.9;transform:translateY(0);filter:blur(0);}
+  }
+
+  .flash{
+    position:fixed;
+    inset:0;
+    z-index:10;
+    pointer-events:none;
+    background:radial-gradient(circle at 50% 48%,rgba(255,216,179,.94),rgba(255,134,66,.44) 32%,rgba(255,118,40,0) 67%);
+    opacity:0;
+  }
+
+  .flash.hit{animation:flash 1.2s ease-out forwards;}
+  @keyframes flash{
+    0%{opacity:0;}
+    8%{opacity:.82;}
+    20%{opacity:.22;}
+    100%{opacity:0;}
+  }
+
+  .outro{
+    min-height:72vh;
+    margin-bottom:10vh;
+    max-width:620px;
+    flex-direction:column;
+  }
+
+  .outro-line{
+    display:block;
+    min-height:1.4em;
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-style:italic;
+    font-weight:700;
+    font-size:clamp(1.35rem,4vw,2rem);
+    line-height:1.55;
+    color:#ffd0a8;
+    --size:clamp(1.35rem,4vw,2rem);
+    --tone:#ffd0a8;
+    --weight:700;
+    --tracking:0em;
+    font-size:var(--size);
+  }
+
+  .ending{
+    min-height:64vh;
+    margin:0;
+    flex-direction:column;
+    opacity:0;
+    transform:translateY(28px);
+    transition:opacity 2s ease,transform 2s ease;
+    pointer-events:none;
+  }
+
+  .ending.visible{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+  }
+
+  .ending a{
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-size:.68rem;
+    letter-spacing:.38em;
+    text-transform:uppercase;
+    color:#cda989;
+    text-decoration:none;
+    opacity:.72;
+    transition:opacity .35s ease,color .35s ease;
+  }
+
+  .ending a:hover,.ending a:focus-visible{opacity:1;color:#ffd0a8;outline:none;}
+  .ending-brand{
+    margin-top:1.4rem;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:.52rem;
+    letter-spacing:.30em;
+    text-transform:uppercase;
+    color:#70665f;
+  }
+
+  .gate{
+    position:fixed;
+    inset:0;
+    z-index:30;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+      radial-gradient(circle at 50% 46%,rgba(78,40,29,.18),transparent 34%),
+      rgba(9,8,7,.985);
+    transition:opacity 1.5s ease,visibility 1.5s ease;
+  }
+
+  .gate.hidden{opacity:0;visibility:hidden;}
+  .gate-inner{text-align:center;}
+  .gate-kicker{
+    margin-bottom:1.3rem;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:.53rem;
+    letter-spacing:.36em;
+    text-transform:uppercase;
+    color:#756b64;
+  }
+  .gate-title{
+    margin:0 0 2.8rem;
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-size:clamp(1.5rem,4vw,2.35rem);
+    font-weight:400;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    color:#c9b8aa;
+  }
+  .gate-button{
+    appearance:none;
+    border:0;
+    padding:1.6rem 2rem;
+    background:transparent;
+    color:#aa998c;
+    font-family:Georgia,'Iowan Old Style',serif;
+    font-size:.68rem;
+    letter-spacing:.46em;
+    text-transform:uppercase;
+    cursor:pointer;
+    opacity:.7;
+    transition:opacity .35s ease,color .35s ease,transform .35s ease;
+  }
+  .gate-button:hover,.gate-button:focus-visible{opacity:1;color:#efb589;transform:translateY(-2px);outline:none;}
+  .gate-note{
+    margin-top:1rem;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:.48rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:#5f5650;
+  }
+
+  .transport{
+    position:fixed;
+    right:max(1rem,env(safe-area-inset-right));
+    bottom:max(1rem,env(safe-area-inset-bottom));
+    z-index:20;
+    display:flex;
+    align-items:center;
+    gap:.62rem;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .8s ease;
+  }
+  body.started .transport{opacity:.28;pointer-events:auto;}
+  body.started .transport:hover{opacity:.86;}
+  .transport button{
+    width:2.15rem;
+    height:2.15rem;
+    border:1px solid rgba(218,190,169,.20);
+    border-radius:50%;
+    background:rgba(9,8,7,.46);
+    color:#c8b5a5;
+    font-size:.7rem;
+    cursor:pointer;
+  }
+  .progress{
+    width:68px;
+    height:1px;
+    overflow:hidden;
+    background:rgba(218,190,169,.14);
+  }
+  .progress span{
+    display:block;
+    width:100%;
+    height:100%;
+    background:#dba47d;
+    transform:scaleX(0);
+    transform-origin:left;
+  }
+
+  .audio-error{
+    position:fixed;
+    left:50%;
+    bottom:1.25rem;
+    z-index:40;
+    transform:translateX(-50%);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:.58rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#c3ad9d;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .4s ease;
+    white-space:nowrap;
+  }
+  .audio-error.visible{opacity:.7;}
+
+  @media (max-width:640px){
+    .experience{padding-top:42vh;}
+    .chapter{margin-bottom:18vh;min-height:34vh;}
+    .rapture{min-height:66vh;margin-bottom:20vh;}
+    .stanza{line-height:1.83;}
+    body.started{cursor:auto;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .glyph{filter:none;}
+    .flash{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<canvas id="surface" aria-hidden="true"></canvas>
+<div class="flash" id="flash"></div>
+
+<div class="gate" id="gate">
+  <div class="gate-inner">
+    <div class="gate-kicker">A Bastard Saint Immersion</div>
+    <h1 class="gate-title">The Fall</h1>
+    <button class="gate-button" id="begin" type="button">Begin</button>
+    <div class="gate-note">Sound required</div>
+  </div>
+</div>
+
+<div class="transport" aria-label="Playback controls">
+  <button id="playPause" type="button" aria-label="Pause">Ⅱ</button>
+  <div class="progress" aria-hidden="true"><span id="progressFill"></span></div>
+  <button id="restart" type="button" aria-label="Restart">↺</button>
+</div>
+
+<div class="audio-error" id="audioError">The score could not be loaded</div>
+<audio id="score" preload="auto" playsinline src="Breath of Ashes.mp3"></audio>
+
+<main class="experience" id="experience">
+  <section class="chapter intro" data-cue="2.5">
+    <div class="intro-title" id="introTitle">The Fall</div>
+    <div class="intro-mark" id="introMark">A poem by Joe Nichols</div>
+  </section>
+
+  <section class="chapter stanza" data-depth="1" data-cue="11">Beyond the sky, an ache. Woman your hands, theirs. Your heart, theirs.</section>
+  <section class="chapter stanza" data-depth="1" data-cue="25">What truth could be purer than your wild sea breaking? What could be learned from their stars that your body doesn't know?</section>
+  <section class="chapter stanza" data-depth="2" data-cue="43">Heaven falls when it falls ravenous: for salted skin, the gasping sigh, for pleasure so near to pain. Mortality's only offering. This is what they came for.</section>
+  <section class="chapter stanza" data-depth="2" data-cue="61">Open, then. Pleasure of you. Passion. The ache. Desire only the broken feel.</section>
+  <section class="chapter stanza" data-depth="3" data-cue="79">Cry out, my love. Let go. Fall, and become divine.</section>
+  <section class="chapter stanza" data-depth="3" data-cue="97">Envy of the rhythm, the burning flow, lips wanting the wild scent of you, lust with a body to live at last.</section>
+
+  <section class="chapter rapture" id="rapture" data-cue="123.8">
+    <div class="rapture-pre">One shattered second.</div>
+    <div class="rapture-word">Rapture.</div>
+    <div class="rapture-after">Beauty is the shortest life.</div>
+  </section>
+
+  <section class="chapter stanza" data-depth="4" data-cue="148">Why would gods want this?</section>
+  <section class="chapter stanza" data-depth="4" data-cue="156">Want. Gasp. Born, gone, perfect.</section>
+  <section class="chapter stanza" data-depth="4" data-cue="164">They crave the surrender. The hunger, lost Yes.</section>
+  <section class="chapter stanza" data-depth="4" data-cue="173">The grace of breath. A touch. A stop. The fall, the thrill, the ache that it ends these belong to us alone, and the gods are out of everything but time.</section>
+  <section class="chapter stanza" data-depth="5" data-cue="184">What is god but desire, a force never sated, wanting without end because it has no end to want toward?</section>
+  <section class="chapter stanza" data-depth="5" data-cue="195">And what is your deepest wave, your giving in, but a touch of the same... where forever meets now, where gods turn human for a breath and taste the bliss they can only have by sharing?</section>
+  <section class="chapter stanza" data-depth="5" data-cue="207">The puzzle, love life, connection, all of it, is human or nothing at all.</section>
+  <section class="chapter stanza" data-depth="5" data-cue="216">Join with me in this most human act, while the heavens fall down seeking truth of flesh, the heart that beats in all things.</section>
+  <section class="chapter stanza" data-depth="5" data-cue="225">For there, in the surrender, we witness the thing itself, the reason, in mortal beauty and nowhere else at all.</section>
+  <section class="chapter stanza" data-depth="5" data-cue="234">In the end, in the start, always, let them worship our mortal skin.</section>
+
+  <section class="chapter outro" data-cue="241" id="outro">
+    <span class="outro-line" data-line-cue="241">For in this</span>
+    <span class="outro-line" data-line-cue="242.6">we grant the gods their one wish:</span>
+    <span class="outro-line" data-line-cue="244.8">to be human,</span>
+    <span class="outro-line" data-line-cue="246.3">just for a breath.</span>
+  </section>
+
+  <section class="chapter ending" id="ending">
+    <a href="https://thebastardsaint.com/the-foyer">Return to the Foyer</a>
+    <div class="ending-brand">The Bastard Saint</div>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  var DURATION = 249.768;
+  var audio = document.getElementById('score');
+  var gate = document.getElementById('gate');
+  var beginButton = document.getElementById('begin');
+  var playPause = document.getElementById('playPause');
+  var restartButton = document.getElementById('restart');
+  var progressFill = document.getElementById('progressFill');
+  var audioError = document.getElementById('audioError');
+  var introTitle = document.getElementById('introTitle');
+  var introMark = document.getElementById('introMark');
+  var rapture = document.getElementById('rapture');
+  var flash = document.getElementById('flash');
+  var ending = document.getElementById('ending');
+  var chapters = Array.prototype.slice.call(document.querySelectorAll('[data-cue]'));
+  var stanzaNodes = Array.prototype.slice.call(document.querySelectorAll('.stanza'));
+  var outroLines = Array.prototype.slice.call(document.querySelectorAll('.outro-line'));
+
+  var canvas = document.getElementById('surface');
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var ripples = [];
+  var drops = [];
+  var glyphs = [];
+  var activeGlyphs = [];
+  var nextGlyphIndex = 0;
+  var frame = 0;
+  var started = false;
+  var raptureImpactFired = false;
+  var lastTime = 0;
+  var fallbackStart = 0;
+  var fallbackPaused = 0;
+  var fallbackRunning = false;
+  var analyser = null;
+  var audioContext = null;
+  var audioData = null;
+  var smoothedEnergy = 0;
+  var lastBeat = 0;
+  var priorEnergy = 0;
+  var wheelLock = function(e){ if(started) e.preventDefault(); };
+
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function lerp(a,b,t){ return a+(b-a)*t; }
+  function smoothstep(t){ t=clamp(t,0,1); return t*t*(3-2*t); }
+  function easeOutCubic(t){ return 1-Math.pow(1-t,3); }
+  function easeOutBack(t){
+    var c1=1.70158,c3=c1+1;
+    return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2);
+  }
+
+  function resizeCanvas(){
+    dpr=Math.min(window.devicePixelRatio||1,2);
+    canvas.width=Math.floor(innerWidth*dpr);
+    canvas.height=Math.floor(innerHeight*dpr);
+    canvas.style.width=innerWidth+'px';
+    canvas.style.height=innerHeight+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+
+  function actualDuration(){
+    return Number.isFinite(audio.duration)&&audio.duration>1?audio.duration:DURATION;
+  }
+
+  function now(){
+    if(Number.isFinite(audio.duration)&&audio.duration>1) return audio.currentTime;
+    if(!fallbackRunning) return fallbackPaused;
+    return Math.min((performance.now()-fallbackStart)/1000,DURATION);
+  }
+
+  function cueAfter(seconds){
+    var candidates=chapters.map(function(n){return parseFloat(n.dataset.cue);}).filter(function(v){return v>seconds;});
+    return candidates.length?Math.min.apply(Math,candidates):actualDuration();
+  }
+
+  function phraseWeights(text){
+    var weights=[];
+    var total=0;
+    for(var i=0;i<text.length;i++){
+      var ch=text[i];
+      if(/\s/.test(ch)) continue;
+      var w=1;
+      if(ch===',') w=2.4;
+      if(ch===':'||ch===';') w=3.2;
+      if(ch==='.'||ch==='?'||ch==='!') w=5.2;
+      if(ch==='…') w=5.2;
+      total+=w;
+      weights.push(total);
+    }
+    return {weights:weights,total:total||1};
+  }
+
+  function makeGlyphs(container,text,startCue,endCue,mode,lineOffset){
+    container.innerHTML='';
+    var frag=document.createDocumentFragment();
+    var available=Math.max(2.1,endCue-startCue);
+    var revealSpan;
+
+    if(mode==='outro') revealSpan=Math.min(1.5,available*.75);
+    else if(available<9) revealSpan=available*.54;
+    else if(available<13) revealSpan=available*.61;
+    else revealSpan=Math.min(11.5,available*.68);
+
+    var tokens=text.trim().split(/\s+/);
+    var visibleCount=(text.match(/\S/g)||[]).length||1;
+    var rainScatter=mode==='outro'?.12:(startCue<124?.26:.18);
+    var burstScatter=mode==='outro'?.08:(startCue<124?.14:.10);
+    var wordCenters=tokens.map(function(token,tokenIndex){
+      var base=tokens.length<=1?.5:tokenIndex/(tokens.length-1||1);
+      var randomDrift=(Math.random()*.82)+(base*.18);
+      return clamp(randomDrift+(Math.random()-.5)*rainScatter,0,1);
+    });
+
+    tokens.forEach(function(token,tokenIndex){
+      var word=document.createElement('span');
+      word.className='word';
+      var wordCenter=wordCenters[tokenIndex];
+
+      for(var j=0;j<token.length;j++){
+        var ch=token[j];
+        var el=document.createElement('span');
+        el.className='glyph';
+        el.textContent=ch;
+
+        var localBase=token.length<=1?0:(j/(token.length-1)-.5);
+        var spray=(Math.random()-.5)*(mode==='outro'?.10:.20);
+        var burst=(Math.random()-.5)*(visibleCount>34?burstScatter*1.25:burstScatter);
+        var punctuationLag=/[.,:;?!…]/.test(ch)?(.05+Math.random()*.05):0;
+        var impactProgress=clamp(wordCenter+localBase*.085+spray+burst+punctuationLag,0,1);
+        var impact=startCue+impactProgress*revealSpan;
+
+        var phase=startCue<124?clamp(startCue/124,0,1):clamp((startCue-148)/95,0,1);
+        var fallDuration;
+        if(mode==='outro') fallDuration=1.85+Math.random()*.45;
+        else if(startCue<80) fallDuration=1.95-phase*.5+Math.random()*.34;
+        else if(startCue<124) fallDuration=1.28+Math.random()*.32;
+        else if(startCue<180) fallDuration=1.05+Math.random()*.28;
+        else fallDuration=1.22+Math.random()*.36;
+
+        var y0=-(innerHeight*(.72+Math.random()*.68));
+        var x0=(Math.random()*44-22);
+        var r0=(Math.random()*22-11);
+        el.style.setProperty('--y0',y0.toFixed(0)+'px');
+        el.style.setProperty('--x0',x0.toFixed(1)+'px');
+        el.style.setProperty('--r0',r0.toFixed(1)+'deg');
+        word.appendChild(el);
+
+        glyphs.push({
+          el:el,
+          start:impact-fallDuration,
+          impact:impact,
+          duration:fallDuration,
+          x0:x0,
+          y0:y0,
+          r0:r0,
+          wind:(Math.random()*26-13),
+          landed:false,
+          punctuation:/[.,:;?!]/.test(ch),
+          mode:mode||'stanza',
+          lineOffset:lineOffset||0
+        });
+      }
+
+      frag.appendChild(word);
+    });
+    container.appendChild(frag);
+  }
+  function buildTypography(){
+    glyphs=[];
+    stanzaNodes.forEach(function(node){
+      if(!node.dataset.sourceText) node.dataset.sourceText=node.textContent.trim();
+      var text=node.dataset.sourceText;
+      var cue=parseFloat(node.dataset.cue);
+      makeGlyphs(node,text,cue,cueAfter(cue),'stanza',0);
+    });
+    outroLines.forEach(function(line){
+      if(!line.dataset.sourceText) line.dataset.sourceText=line.textContent.trim();
+      var text=line.dataset.sourceText;
+      var cue=parseFloat(line.dataset.lineCue);
+      makeGlyphs(line,text,cue,Math.min(cue+2.2,actualDuration()),'outro',0);
+    });
+    glyphs.sort(function(a,b){return a.start-b.start;});
+    nextGlyphIndex=0;
+  }
+
+  function resetTypography(){
+    glyphs.forEach(function(g){
+      g.landed=false;
+      g.el.classList.remove('settled');
+      g.el.style.opacity='0';
+      g.el.style.filter='blur(8px)';
+      g.el.style.transform='translate3d('+g.x0+'px,'+g.y0+'px,0) rotate('+g.r0+'deg)';
+      g.el.style.textShadow='none';
+    });
+    activeGlyphs=[];
+    nextGlyphIndex=0;
+  }
+
+  function addRippleAtElement(el,force,warm){
+    var r=el.getBoundingClientRect();
+    var x=r.left+r.width/2+window.scrollX;
+    var y=r.top+r.height*.82+window.scrollY;
+    addRipple(x,y,force,warm);
+  }
+
+  function addRipple(x,y,force,warm){
+    force=force||1;
+    ripples.push({x:x,y:y,born:performance.now(),life:1600+force*760,max:22+force*42,alpha:.17+force*.085,warm:!!warm,ring:0});
+    if(force>1.8){
+      ripples.push({x:x,y:y,born:performance.now()+80,life:2600,max:110+force*72,alpha:.22,warm:true,ring:1});
+      ripples.push({x:x,y:y,born:performance.now()+190,life:3400,max:190+force*96,alpha:.145,warm:true,ring:2});
+    }
+  }
+
+  function addBeatRipple(force){
+    var y=window.scrollY+innerHeight*(.50+Math.random()*.06);
+    addRipple(innerWidth*(.44+Math.random()*.12),y,.5+force*.6,true);
+  }
+
+  function landGlyph(g){
+    if(g.landed) return;
+    g.landed=true;
+    g.el.classList.add('settled');
+    g.el.style.opacity='';
+    g.el.style.filter='';
+    g.el.style.transform='';
+    g.el.style.textShadow='';
+    var force=g.punctuation?1.05:.52;
+    if(g.mode==='outro') force+=.42;
+    addRippleAtElement(g.el,force,g.impact>=148);
+  }
+
+  function updateGlyphs(t){
+    while(nextGlyphIndex<glyphs.length && glyphs[nextGlyphIndex].start<=t){
+      activeGlyphs.push(glyphs[nextGlyphIndex]);
+      nextGlyphIndex++;
+    }
+
+    for(var i=activeGlyphs.length-1;i>=0;i--){
+      var g=activeGlyphs[i];
+      var p=(t-g.start)/g.duration;
+      if(p>=1){
+        landGlyph(g);
+        activeGlyphs.splice(i,1);
+        continue;
+      }
+      if(p<0) continue;
+
+      var fall=easeOutCubic(clamp(p,0,1));
+      var settle=easeOutBack(clamp(p,0,1));
+      var y=g.y0*(1-fall);
+      if(p>.82){
+        var bounce=(p-.82)/.18;
+        y+=Math.sin(bounce*Math.PI)*9*(1-bounce);
+      }
+      var x=g.x0*(1-fall)+Math.sin(p*Math.PI)*g.wind*(1-p);
+      var rotation=g.r0*(1-settle);
+      var opacity=clamp(p*3.2,0,1);
+      var blur=Math.max(0,(1-fall)*8);
+      var trail=Math.min(52,Math.abs(y)*.085);
+      g.el.style.opacity=opacity.toFixed(3);
+      g.el.style.filter='blur('+blur.toFixed(2)+'px)';
+      g.el.style.transform='translate3d('+x.toFixed(2)+'px,'+y.toFixed(2)+'px,0) rotate('+rotation.toFixed(2)+'deg)';
+      g.el.style.textShadow='0 -'+trail.toFixed(1)+'px '+Math.max(8,trail*.5).toFixed(1)+'px rgba(255,188,139,'+(0.08+smoothedEnergy*.22).toFixed(3)+')';
+    }
+  }
+
+  function currentEnergy(){
+    if(!analyser||!audioData) return 0;
+    analyser.getByteTimeDomainData(audioData);
+    var sum=0;
+    for(var i=0;i<audioData.length;i++){
+      var v=(audioData[i]-128)/128;
+      sum+=v*v;
+    }
+    return Math.sqrt(sum/audioData.length);
+  }
+
+  function setupAudioGraph(){
+    if(audioContext) return;
+    try{
+      audioContext=new (window.AudioContext||window.webkitAudioContext)();
+      var source=audioContext.createMediaElementSource(audio);
+      analyser=audioContext.createAnalyser();
+      analyser.fftSize=512;
+      analyser.smoothingTimeConstant=.76;
+      audioData=new Uint8Array(analyser.fftSize);
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+    }catch(err){
+      analyser=null;
+    }
+  }
+
+  function updateMusicReactive(t){
+    var raw=currentEnergy();
+    var normalized=clamp((raw-.012)*6.4,0,1);
+    smoothedEnergy=lerp(smoothedEnergy,normalized,.095);
+    var timeHeat;
+    if(t<43) timeHeat=lerp(.03,.20,t/43);
+    else if(t<97) timeHeat=lerp(.20,.58,(t-43)/54);
+    else if(t<124) timeHeat=lerp(.58,1,(t-97)/27);
+    else if(t<148) timeHeat=lerp(.30,.14,(t-124)/24);
+    else if(t<207) timeHeat=lerp(.25,.82,(t-148)/59);
+    else timeHeat=lerp(.82,.46,(t-207)/(actualDuration()-207));
+
+    var heat=clamp(timeHeat+smoothedEnergy*.28,0,1);
+    var light=clamp(smoothedEnergy*.78+(t>118&&t<126?.35:0),0,1);
+    document.documentElement.style.setProperty('--music',smoothedEnergy.toFixed(3));
+    document.documentElement.style.setProperty('--heat',heat.toFixed(3));
+    document.documentElement.style.setProperty('--light',light.toFixed(3));
+
+    var delta=normalized-priorEnergy;
+    if(delta>.12 && performance.now()-lastBeat>620 && t>18){
+      addBeatRipple(clamp(delta*2.4,.3,1));
+      lastBeat=performance.now();
+    }
+    priorEnergy=lerp(priorEnergy,normalized,.18);
+  }
+
+  function drawSurface(){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    var nowMs=performance.now();
+    ctx.save();
+    ctx.globalCompositeOperation='screen';
+
+    for(var i=ripples.length-1;i>=0;i--){
+      var r=ripples[i];
+      var age=nowMs-r.born;
+      if(age<0) continue;
+      var p=age/r.life;
+      if(p>=1){ripples.splice(i,1);continue;}
+      var eased=1-Math.pow(1-p,2.5);
+      var radius=r.max*eased;
+      var x=r.x-window.scrollX;
+      var y=r.y-window.scrollY;
+      if(y<-r.max||y>innerHeight+r.max) continue;
+      var alpha=r.alpha*Math.pow(1-p,1.7);
+      ctx.beginPath();
+      ctx.ellipse(x,y,radius,radius*(.24+.03*r.ring),0,0,Math.PI*2);
+      ctx.strokeStyle=r.warm?'rgba(255,178,122,'+alpha+')':'rgba(211,198,186,'+alpha+')';
+      ctx.lineWidth=.7+r.ring*.45;
+      ctx.stroke();
+
+      if(p<.32){
+        var bloomAlpha=alpha*(1-p/.32)*.65;
+        var grad=ctx.createRadialGradient(x,y,0,x,y,9+r.max*.12);
+        grad.addColorStop(0,'rgba(255,207,169,'+bloomAlpha+')');
+        grad.addColorStop(1,'rgba(255,173,110,0)');
+        ctx.fillStyle=grad;
+        ctx.fillRect(x-28,y-28,56,56);
+      }
+    }
+
+    for(var d=drops.length-1;d>=0;d--){
+      var drop=drops[d];
+      drop.y+=drop.speed;
+      drop.life-=.012;
+      if(drop.y>innerHeight+20||drop.life<=0){drops.splice(d,1);continue;}
+      ctx.beginPath();
+      ctx.moveTo(drop.x,drop.y);
+      ctx.lineTo(drop.x+drop.slant,drop.y-drop.length);
+      ctx.strokeStyle='rgba(232,203,180,'+(drop.life*.055)+')';
+      ctx.lineWidth=.55;
+      ctx.stroke();
+    }
+
+    if(smoothedEnergy>.09 && Math.random()<.10+smoothedEnergy*.18){
+      drops.push({x:Math.random()*innerWidth,y:-20,speed:1.1+smoothedEnergy*2.8,length:15+Math.random()*36,slant:Math.random()*3-1.5,life:.6+Math.random()*.4});
+    }
+    ctx.restore();
+  }
+
+  function fireRapture(t){
+    if(t>=122.15) rapture.classList.add('pre-in');
+    if(t>=123.08) rapture.classList.add('impact');
+    if(t>=123.97 && !raptureImpactFired){
+      raptureImpactFired=true;
+      flash.classList.remove('hit');
+      void flash.offsetWidth;
+      flash.classList.add('hit');
+      var word=rapture.querySelector('.rapture-word');
+      addRippleAtElement(word,4.7,true);
+      if(navigator.vibrate) navigator.vibrate(35);
+    }
+    if(t>=126.05) rapture.classList.add('after-in');
+  }
+
+  function scrollToTime(t){
+    var first=chapters[0];
+    var last=chapters[chapters.length-1];
+    var a=first,b=last;
+    for(var i=0;i<chapters.length-1;i++){
+      var ca=parseFloat(chapters[i].dataset.cue);
+      var cb=parseFloat(chapters[i+1].dataset.cue);
+      if(t>=ca&&t<=cb){a=chapters[i];b=chapters[i+1];break;}
+      if(t<parseFloat(first.dataset.cue)){a=first;b=first;}
+      if(t>parseFloat(last.dataset.cue)){a=last;b=last;}
+    }
+    var ta=parseFloat(a.dataset.cue);
+    var tb=parseFloat(b.dataset.cue);
+    var local=ta===tb?0:(t-ta)/(tb-ta);
+    var gap=tb-ta;
+    var hold=gap>18?.70:gap>12?.60:gap>9?.52:.36;
+    local=local<=hold?0:smoothstep((local-hold)/(1-hold));
+    var centerA=a.offsetTop+a.offsetHeight*.5;
+    var centerB=b.offsetTop+b.offsetHeight*.5;
+    var center=lerp(centerA,centerB,local);
+    window.scrollTo(0,Math.max(0,center-innerHeight*.5));
+  }
+
+  function updateIntro(t){
+    if(t>=2.5&&!introTitle.classList.contains('landed')){
+      introTitle.classList.add('landed');
+      setTimeout(function(){addRippleAtElement(introTitle,1.8,false);},1850);
+    }
+    if(t>=5.2) introMark.classList.add('visible');
+  }
+
+  function render(){
+    if(!started) return;
+    var t=now();
+    var duration=actualDuration();
+    var p=clamp(t/duration,0,1);
+    updateIntro(t);
+    updateGlyphs(t);
+    updateMusicReactive(t);
+    fireRapture(t);
+    scrollToTime(t);
+    drawSurface();
+    progressFill.style.transform='scaleX('+p.toFixed(4)+')';
+
+    if(t>=248.7) ending.classList.add('visible');
+    if(p>=1){
+      playPause.textContent='▶';
+      playPause.setAttribute('aria-label','Play');
+      drawSurface();
+      return;
+    }
+    frame=requestAnimationFrame(render);
+  }
+
+  function startFallback(){
+    fallbackStart=performance.now()-fallbackPaused*1000;
+    fallbackRunning=true;
+  }
+
+  function begin(){
+    if(started){
+      audio.play().then(function(){audioError.classList.remove('visible');}).catch(function(){});
+      return;
+    }
+    started=true;
+    document.body.classList.add('started');
+    gate.classList.add('hidden');
+    window.scrollTo(0,0);
+    var promise=audio.play();
+    if(promise&&promise.catch){
+      promise.catch(function(){
+        audioError.textContent='Tap Begin again to start the score';
+        audioError.classList.add('visible');
+      });
+    }
+    setTimeout(function(){
+      if(audio.paused){
+        audioError.textContent='Tap Begin again to start the score';
+        audioError.classList.add('visible');
+      }
+    },900);
+    render();
+  }
+
+  function toggle(){
+    if(!started){begin();return;}
+    if(Number.isFinite(audio.duration)&&audio.duration>1){
+      if(audio.paused){
+        audio.play().catch(function(){ audioError.classList.add('visible'); });
+        playPause.textContent='Ⅱ';
+        cancelAnimationFrame(frame);
+        render();
+      }else{
+        audio.pause();
+        playPause.textContent='▶';
+      }
+    }else{
+      if(fallbackRunning){
+        fallbackPaused=now();fallbackRunning=false;playPause.textContent='▶';
+      }else{
+        startFallback();playPause.textContent='Ⅱ';cancelAnimationFrame(frame);render();
+      }
+    }
+  }
+
+  function restart(){
+    cancelAnimationFrame(frame);
+    ripples=[];
+    drops=[];
+    raptureImpactFired=false;
+    rapture.className='chapter rapture';
+    flash.classList.remove('hit');
+    ending.classList.remove('visible');
+    introTitle.classList.remove('landed');
+    introMark.classList.remove('visible');
+    resetTypography();
+    audio.currentTime=0;
+    fallbackPaused=0;
+    if(Number.isFinite(audio.duration)&&audio.duration>1) audio.play();
+    else startFallback();
+    playPause.textContent='Ⅱ';
+    window.scrollTo(0,0);
+    render();
+  }
+
+  resizeCanvas();
+  buildTypography();
+  window.addEventListener('resize',function(){
+    resizeCanvas();
+  });
+  window.addEventListener('wheel',wheelLock,{passive:false});
+  window.addEventListener('touchmove',wheelLock,{passive:false});
+  beginButton.addEventListener('click',begin);
+  playPause.addEventListener('click',toggle);
+  restartButton.addEventListener('click',restart);
+  document.addEventListener('keydown',function(e){
+    if(e.code==='Space'){e.preventDefault();toggle();}
+    if(e.key==='r'||e.key==='R') restart();
+  });
+  audio.addEventListener('loadedmetadata',function(){
+    buildTypography();
+  });
+  audio.addEventListener('playing',function(){
+    fallbackRunning=false;
+    audioError.classList.remove('visible');
+    playPause.textContent='Ⅱ';
+  });
+  audio.addEventListener('pause',function(){
+    if(started&&audio.currentTime<audio.duration) playPause.textContent='▶';
+  });
+  audio.addEventListener('ended',function(){
+    ending.classList.add('visible');
+    playPause.textContent='▶';
+    progressFill.style.transform='scaleX(1)';
+  });
+})();
+</script>
+</body>
+</html>
