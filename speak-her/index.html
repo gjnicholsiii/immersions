@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Speak Her</title>
+<style>
+  :root{
+    --bg:#080607;
+    --paper:#f2e8de;
+    --soft:#cdb9aa;
+    --gold:#ddb77c;
+    --blood:#b96d74;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:auto}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 50% 10%, rgba(221,183,124,.10), transparent 24%),
+      radial-gradient(circle at 50% 78%, rgba(255,255,255,.035), transparent 20%),
+      linear-gradient(180deg, #090607 0%, #070506 45%, #090607 100%);
+    color:var(--paper);
+    font-family: Baskerville, "Baskerville Old Face", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 28%, rgba(255,255,255,.03), transparent 16%),
+      radial-gradient(circle at 82% 34%, rgba(255,255,255,.025), transparent 22%),
+      radial-gradient(circle at 50% 50%, rgba(221,183,124,.035), transparent 30%);
+    filter:blur(22px);
+    z-index:0;
+  }
+  #ambientDust, #impactCanvas{position:fixed;inset:0;pointer-events:none;z-index:2}
+  .start-screen,.end-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,6,7,.92);backdrop-filter:blur(3px);z-index:20;transition:opacity .8s ease,visibility .8s ease}
+  .hidden{opacity:0;visibility:hidden;pointer-events:none}.gate{text-align:center;padding:2rem;max-width:640px}
+  .tiny{font-size:.72rem;letter-spacing:.44em;text-transform:uppercase;color:rgba(242,232,222,.44);margin-bottom:1rem}
+  .title{font-size:clamp(2.1rem,5vw,4rem);font-style:italic;color:rgba(242,232,222,.98)}
+  .subtitle{margin-top:.8rem;font-size:.95rem;color:rgba(242,232,222,.58);letter-spacing:.08em}
+  .gate button{margin-top:1.6rem;appearance:none;border:1px solid rgba(242,232,222,.18);background:rgba(255,255,255,.02);color:rgba(242,232,222,.84);padding:.95rem 1.4rem;font-size:.8rem;letter-spacing:.32em;text-transform:uppercase;font-family:inherit;cursor:pointer;transition:all .35s ease}
+  .gate button:hover{color:#fff;border-color:rgba(221,183,124,.46);box-shadow:0 0 22px rgba(221,183,124,.08)}
+  .page{position:relative;z-index:1;width:min(820px,92vw);margin:0 auto;padding:28vh 0 42vh}.header-mark{text-align:center;margin-bottom:14vh;opacity:.38}
+  .header-mark .small{font-size:.68rem;letter-spacing:.42em;text-transform:uppercase;color:rgba(242,232,222,.42)}.header-mark .name{margin-top:.6rem;font-size:1.05rem;font-style:italic;color:rgba(242,232,222,.62)}
+  .stack{position:relative;display:flex;flex-direction:column;gap:20vh}.stanza{position:relative;min-height:16vh;text-align:center;opacity:.12;transform:translateY(32px) scale(.985);transition:opacity 1.1s ease,transform 1.1s ease,filter 1.1s ease;filter:blur(1px);padding:2.5rem 1rem}
+  .stanza.active{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}.stanza.settled{opacity:.92}.stanza::after{content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);width:min(76vw,560px);height:40px;background:radial-gradient(ellipse at center,rgba(255,255,255,.05),rgba(221,183,124,.03) 35%,transparent 70%);filter:blur(16px);opacity:0;transition:opacity 1.2s ease;pointer-events:none}.stanza.active::after{opacity:.55}
+  .line{position:relative;display:block;margin:.28em 0;min-height:1.2em;line-height:1.18;white-space:pre-wrap}.line.tight{margin:.14em 0}.char,.space{display:inline-block;position:relative;vertical-align:baseline}.space{width:.34em}
+  .char{opacity:0;filter:blur(4px);transform:translate3d(var(--dx,0px),calc(-1 * var(--drop,200px)),0) rotate(var(--rot,0deg)) scale(.45);transition:transform var(--dur,1400ms) cubic-bezier(.12,.82,.18,1.04),opacity calc(var(--dur,1400ms)*.84) ease,filter calc(var(--dur,1400ms)*.92) ease,text-shadow 900ms ease;transition-delay:var(--delay,0ms);will-change:transform,opacity,filter;text-shadow:0 0 0 rgba(255,255,255,0)}
+  .char::before{content:"";position:absolute;left:50%;bottom:calc(100% + .06em);transform:translateX(-50%);width:1.5px;height:1.3em;background:linear-gradient(to top,rgba(242,232,222,.42),rgba(242,232,222,0));filter:blur(.8px);opacity:0;transition:opacity 220ms ease;transition-delay:var(--delay,0ms);pointer-events:none}
+  .stanza.active .char{opacity:1;filter:blur(0);transform:translate3d(0,0,0) rotate(0deg) scale(1);text-shadow:0 0 10px rgba(221,183,124,.08)}.stanza.active .char::before{opacity:.92;animation:dustTrail .64s ease-out forwards;animation-delay:var(--delay,0ms)}
+  @keyframes dustTrail{0%{opacity:.85;transform:translateX(-50%) translateY(-.2em) scaleY(1.15)}100%{opacity:0;transform:translateX(-50%) translateY(1.1em) scaleY(.34)}}
+  .accent{color:var(--gold)}.blood{color:var(--blood)}.dim{color:rgba(242,232,222,.72)}.size-xs{font-size:clamp(1rem,2vw,1.2rem);letter-spacing:.18em;text-transform:uppercase}.size-sm{font-size:clamp(1.4rem,3vw,1.9rem);letter-spacing:.08em}.size-md{font-size:clamp(2rem,4.8vw,3.4rem);font-style:italic}.size-lg{font-size:clamp(2.6rem,7vw,5.2rem);font-style:italic}.size-xl{font-size:clamp(3.4rem,9vw,6.6rem);font-style:italic}.footer-space{height:18vh}
+  .hud{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);width:min(64vw,680px);z-index:10;opacity:.42;transition:opacity .4s ease}.hud:hover{opacity:.85}.track{height:1px;background:rgba(255,255,255,.08);overflow:hidden}.bar{height:100%;width:0%;background:linear-gradient(90deg,rgba(255,255,255,.22),rgba(221,183,124,.96),rgba(255,255,255,.22));box-shadow:0 0 14px rgba(221,183,124,.26)}
+  @media(max-width:720px){.page{padding-top:24vh;padding-bottom:36vh}.stack{gap:18vh}.stanza{padding:2rem .5rem}}
+</style>
+</head>
+<body>
+<canvas id="ambientDust"></canvas><canvas id="impactCanvas"></canvas>
+<div class="start-screen" id="startScreen"><div class="gate"><div class="tiny">Immersion</div><div class="title">Speak Her</div><div class="subtitle">Dust. Descent. Invocation.</div><button id="beginBtn" type="button">Begin</button></div></div>
+<div class="end-screen hidden" id="endScreen"><div class="gate"><div class="tiny">Coda</div><div class="title">And we dance</div><button id="replayBtn" type="button">Begin Again</button></div></div>
+<div class="hud"><div class="track"><div class="bar" id="progressBar"></div></div></div>
+<main class="page"><div class="header-mark"><div class="small">Speak Her</div><div class="name">A poem by Joe Nichols</div></div><section class="stack" id="stack"></section><div class="footer-space"></div></main>
+<audio id="score" preload="auto" playsinline src="Speak-Her.mp3"></audio>
+<script>
+(()=>{const DURATION=213.768;const STANZAS=[{cue:.3,lines:[{text:'SPEAK',size:'size-xl',tone:'accent'},{text:'Her',size:'size-xl',tone:''}]},{cue:12,lines:[{text:'OF WOMANHOOD',size:'size-xs',tone:'dim'},{text:'Of love',size:'size-lg',tone:'accent'},{text:'OF LOSS',size:'size-xs',tone:'dim'},{text:'Of healing',size:'size-lg',tone:''}]},{cue:38,lines:[{text:'HER WORDS',size:'size-xs',tone:'dim'},{text:'UNBOUND',size:'size-lg',tone:''},{text:'UNCAGED',size:'size-lg',tone:'accent'},{text:'UNAPOLOGETIC',size:'size-md',tone:''}]},{cue:53,lines:[{text:'IN HER HANDS',size:'size-xs',tone:'dim'},{text:'A SCALPEL',size:'size-lg',tone:''},{text:'A brush',size:'size-lg',tone:'accent'},{text:'A PEN',size:'size-lg',tone:''}]},{cue:66,lines:[{text:'SHE PAINTS',size:'size-xs',tone:'dim'},{text:'WITH BLOOD',size:'size-lg',tone:'blood'},{text:'With tears',size:'size-lg',tone:''},{text:'With joy',size:'size-lg',tone:'accent'}]},{cue:84,lines:[{text:'SHE BARES ALL',size:'size-xs',tone:'dim'},{text:'TO THE WORLD',size:'size-md',tone:''},{text:'To the moon',size:'size-lg',tone:'accent'},{text:'TO THE STARS',size:'size-md',tone:''}]},{cue:101,lines:[{text:'HER BODY',size:'size-xs',tone:'dim'},{text:'A TEMPLE',size:'size-lg',tone:''},{text:'A SANCTUARY',size:'size-lg',tone:'accent'},{text:'A SHRINE',size:'size-lg',tone:''}]},{cue:119,lines:[{text:'WITHIN HER',size:'size-xs',tone:'dim'},{text:'Oceans',size:'size-xl',tone:''},{text:'OF ECSTASY',size:'size-sm',tone:'accent'},{text:'Of desire',size:'size-md',tone:'blood'},{text:'Of rapture',size:'size-lg',tone:'accent'}]},{cue:144,lines:[{text:'HER VOICE',size:'size-xs',tone:'dim'},{text:'AN ANTHEM',size:'size-md',tone:''},{text:'A prayer',size:'size-lg',tone:'accent'},{text:'A MANTRA',size:'size-md',tone:''}]},{cue:151,lines:[{text:'IN EVERY BREATH',size:'size-xs',tone:'dim'},{text:'IN EVERY WORD',size:'size-xs',tone:'dim'},{text:'IN EVERY SILENCE',size:'size-xs',tone:'dim'},{text:'REVOLUTION',size:'size-lg',tone:''},{text:'REBELLION',size:'size-lg',tone:'blood'},{text:'RAVAGING',size:'size-lg',tone:'accent'}]},{cue:172,lines:[{text:'SHE IS',size:'size-lg',tone:''},{text:'SHE WAS',size:'size-md',tone:'dim'},{text:'SHE WILL BE',size:'size-lg',tone:'accent'}]},{cue:180,lines:[{text:'ETERNAL · TIMELESS · BOUNDLESS',size:'size-xs',tone:'dim'},{text:'A GODDESS',size:'size-lg',tone:''},{text:'An empress',size:'size-xl',tone:'accent'},{text:'A QUEEN',size:'size-lg',tone:''}]},{cue:196,lines:[{text:'IN HER SHADOW',size:'size-sm',tone:'dim'},{text:'We find solace',size:'size-lg',tone:''},{text:'IN HER LIGHT',size:'size-sm',tone:'accent'},{text:'We bathe',size:'size-lg',tone:'accent'}]},{cue:203,lines:[{text:'SHE SETS OUR SOULS',size:'size-xs',tone:'dim'},{text:'ABLAZE',size:'size-xl',tone:'accent'}]},{cue:209,lines:[{text:'And we dance',size:'size-xl',tone:'accent'}]}];
+const stack=document.getElementById('stack'),score=document.getElementById('score'),beginBtn=document.getElementById('beginBtn'),replayBtn=document.getElementById('replayBtn'),startScreen=document.getElementById('startScreen'),endScreen=document.getElementById('endScreen'),progressBar=document.getElementById('progressBar'),dustCanvas=document.getElementById('ambientDust'),impactCanvas=document.getElementById('impactCanvas'),dctx=dustCanvas.getContext('2d'),ictx=impactCanvas.getContext('2d');let activeIndex=-1,currentAnchor=-1,raf=0,started=false,W=0,H=0,ambient=[],ripples=[];
+function resize(){W=innerWidth;H=innerHeight;[dustCanvas,impactCanvas].forEach(c=>{c.width=W*Math.min(2,devicePixelRatio||1);c.height=H*Math.min(2,devicePixelRatio||1);c.style.width=W+'px';c.style.height=H+'px'});dctx.setTransform(dustCanvas.width/W,0,0,dustCanvas.height/H,0,0);ictx.setTransform(impactCanvas.width/W,0,0,impactCanvas.height/H,0,0);if(!ambient.length)createAmbient()}
+function createAmbient(){ambient=Array.from({length:110},()=>({x:Math.random()*W,y:Math.random()*H,vy:.18+Math.random()*.75,vx:(Math.random()-.5)*.18,r:.4+Math.random()*1.6,a:.07+Math.random()*.18}))}
+function makeChars(lineEl){const text=lineEl.dataset.text,frag=document.createDocumentFragment();let visibleIndex=0;for(const ch of text){if(ch===' '){const sp=document.createElement('span');sp.className='space';frag.appendChild(sp);continue}const span=document.createElement('span');span.className='char';span.textContent=ch;span.style.setProperty('--dx',(Math.random()*26-13).toFixed(1)+'px');span.style.setProperty('--drop',(160+Math.random()*220).toFixed(0)+'px');span.style.setProperty('--rot',(Math.random()*18-9).toFixed(1)+'deg');span.style.setProperty('--dur',(1100+Math.random()*900).toFixed(0)+'ms');span.style.setProperty('--delay',(visibleIndex*34+Math.random()*220).toFixed(0)+'ms');frag.appendChild(span);visibleIndex++}lineEl.appendChild(frag)}
+const stanzaEls=STANZAS.map((stanza,idx)=>{const block=document.createElement('article');block.className='stanza';block.dataset.index=idx;block.dataset.cue=stanza.cue;stanza.lines.forEach((ln,lineIdx)=>{const line=document.createElement('div');line.className=`line ${ln.size} ${ln.tone||''}`;if(lineIdx>0&&lineIdx<stanza.lines.length-1&&ln.size==='size-xs')line.classList.add('tight');line.dataset.text=ln.text;makeChars(line);block.appendChild(line)});stack.appendChild(block);return block});
+function activateStanza(index){if(index<=activeIndex)return;for(let i=activeIndex+1;i<=index;i++){stanzaEls[i].classList.add('active');setTimeout(()=>spawnRevealRipples(stanzaEls[i]),850);setTimeout(()=>stanzaEls[i].classList.add('settled'),1800)}activeIndex=index}
+function spawnRevealRipples(stanzaEl){const rect=stanzaEl.getBoundingClientRect(),x=rect.left+rect.width/2,y=rect.top+rect.height*.86;ripples.push({x,y,r:8,alpha:.36,grow:1.8,life:1.4},{x,y,r:18,alpha:.24,grow:1.35,life:1.75})}
+function drawAmbient(){dctx.clearRect(0,0,W,H);dctx.fillStyle='rgba(242,232,222,.18)';for(const p of ambient){p.x+=p.vx;p.y+=p.vy;if(p.y>H+5){p.y=-10;p.x=Math.random()*W}if(p.x<-5)p.x=W+5;if(p.x>W+5)p.x=-5;dctx.globalAlpha=p.a;dctx.beginPath();dctx.arc(p.x,p.y,p.r,0,Math.PI*2);dctx.fill()}dctx.globalAlpha=1}
+function drawRipples(dt){ictx.clearRect(0,0,W,H);for(let i=ripples.length-1;i>=0;i--){const r=ripples[i];r.life-=dt;r.r+=r.grow*34*dt;r.alpha*=.985;if(r.life<=0||r.alpha<.01){ripples.splice(i,1);continue}ictx.strokeStyle=`rgba(221,183,124,${r.alpha})`;ictx.lineWidth=1.1;ictx.beginPath();ictx.ellipse(r.x,r.y,r.r*2.2,r.r*.44,0,0,Math.PI*2);ictx.stroke()}}
+function updateScroll(currentTime){let targetIdx=0;for(let i=0;i<STANZAS.length;i++){if(currentTime>=STANZAS[i].cue)targetIdx=i;else break}if(targetIdx!==currentAnchor){currentAnchor=targetIdx;const el=stanzaEls[currentAnchor],top=scrollY+el.getBoundingClientRect().top-H*.23;scrollTo({top:Math.max(0,top),behavior:'smooth'})}}
+function frame(){const t=score.currentTime||0;let idx=-1;for(let i=0;i<STANZAS.length;i++){if(t>=STANZAS[i].cue)idx=i;else break}if(idx>-1)activateStanza(idx);updateScroll(t);progressBar.style.width=(Math.min(1,t/DURATION)*100).toFixed(3)+'%';drawAmbient();drawRipples(1/60);if(score.ended||t>=DURATION-.02){endScreen.classList.remove('hidden');cancelAnimationFrame(raf);return}raf=requestAnimationFrame(frame)}
+async function begin(){try{score.currentTime=0;activeIndex=-1;currentAnchor=-1;stanzaEls.forEach(el=>el.classList.remove('active','settled'));ripples=[];startScreen.classList.add('hidden');endScreen.classList.add('hidden');progressBar.style.width='0%';scrollTo({top:0,behavior:'auto'});await score.play();started=true;cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}catch(err){beginBtn.textContent='Click Again'}}
+beginBtn.addEventListener('click',begin);replayBtn.addEventListener('click',begin);addEventListener('resize',resize);score.addEventListener('pause',()=>{if(started&&!score.ended)cancelAnimationFrame(raf)});score.addEventListener('play',()=>{if(started){cancelAnimationFrame(raf);raf=requestAnimationFrame(frame)}});resize();drawAmbient()})();
+</script>
+</body>
+</html>
