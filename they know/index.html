@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>the one who knows</title>
+<style>
+  :root{
+    --bg:#0b0910;
+    --knowing:#cfe0e8;
+    --attack:#d4632c;
+    --attack-hot:#f2b27a;
+    --ash:#a97a5e;
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family: Georgia, 'Iowan Old Style', serif;
+  }
+  .vignette{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 46%, transparent 0%, rgba(0,0,0,0.82) 80%);
+    pointer-events:none;
+    z-index:6;
+  }
+  .spiral{
+    position:fixed;
+    top:50%; left:50%;
+    width:0; height:0;
+    z-index:3;
+  }
+  .line{
+    position:absolute;
+    top:0; left:0;
+    white-space:nowrap;
+    opacity:0;
+    transition: opacity 1s ease, transform 1s cubic-bezier(.2,.9,.3,1), color 1.4s ease;
+  }
+  .line.k{
+    font-style:italic;
+    color: var(--knowing);
+  }
+  .line.a{
+    font-family:'Courier New', ui-monospace, monospace;
+    font-weight:bold;
+    text-transform:uppercase;
+    color: var(--attack);
+    letter-spacing:0.04em;
+  }
+  .line.merge{
+    font-style:italic;
+    color: var(--ash);
+    letter-spacing: 0.015em;
+  }
+  @keyframes tremor{
+    0%{ transform: translate(0,0) rotate(0deg); }
+    20%{ transform: translate(-1px,1px) rotate(-0.4deg); }
+    40%{ transform: translate(1px,-1px) rotate(0.5deg); }
+    60%{ transform: translate(-1px,-1px) rotate(-0.3deg); }
+    80%{ transform: translate(1px,1px) rotate(0.4deg); }
+    100%{ transform: translate(0,0) rotate(0deg); }
+  }
+  @keyframes tremorHard{
+    0%{ transform: translate(0,0) rotate(0deg); }
+    20%{ transform: translate(-2.5px,2px) rotate(-0.9deg); }
+    40%{ transform: translate(2px,-2.5px) rotate(1.1deg); }
+    60%{ transform: translate(-2.5px,-2px) rotate(-0.7deg); }
+    80%{ transform: translate(2px,2.5px) rotate(0.9deg); }
+    100%{ transform: translate(0,0) rotate(0deg); }
+  }
+  .line.a.jitter{ animation: tremor 0.22s linear infinite; }
+  .line.a.jitter-hard{ animation: tremorHard 0.15s linear infinite; }
+
+  .flinch{
+    position:fixed; inset:0;
+    background: var(--bg);
+    z-index:7;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity 0.4s ease;
+  }
+  .flinch.on{ opacity:0.5; }
+
+  .blackout{
+    position:fixed; inset:0;
+    background: var(--bg);
+    z-index:8;
+    opacity:0;
+    pointer-events:none;
+    transition: opacity 1.8s ease;
+  }
+  .blackout.on{ opacity:1; }
+</style>
+</head>
+<body>
+
+<div class="spiral" id="spiral"></div>
+<div class="vignette"></div>
+<div class="flinch" id="flinch"></div>
+<div class="blackout" id="blackout"></div>
+
+<script>
+/*
+  Pushed further this time. The argument doesn't stay clever
+  or contained — it goes to the place it actually goes, alone,
+  at night, when there's no one to perform composure for.
+  One question near the end gets asked and nothing answers it.
+  Nothing. Not evasion — silence, real silence, because there
+  is no answer. And the final line isn't shouted. By the end
+  the attacking voice doesn't need volume anymore — it just
+  says the thing plainly, in the same register the honest voice
+  used at the start, because by then they aren't different
+  voices. That's the whole wound. It was never two people.
+*/
+
+const lines = [
+  { v:'k', text: "she said I never said that" },
+  { v:'k', text: "I said it twice" },
+  { v:'a', text: "maybe you're remembering it different" },
+  { v:'k', text: "no. I have the text" },
+  { v:'a', text: "so now you're going to bring up a text" },
+  { v:'k', text: "she looked right at me and lied" },
+  { v:'a', text: "and you just stood there" },
+  { v:'a', text: "like you always do" },
+  { v:'k', text: "I didn't know what to say" },
+  { v:'a', text: "you never know what to say" },
+  { v:'a', text: "that's the whole problem" },
+  { v:'k', text: "I'm not the one lying" },
+  { v:'a', text: "you're the one who let it happen" },
+  { v:'a', text: "again" },
+  { v:'k', text: "I hate that I saw it and said nothing" },
+  { v:'a', text: "good. hate it. do something with it for once" },
+  { v:'k', text: "I'm not a coward" },
+  { v:'a', text: "then why are you still standing here" },
+  { v:'k', text: "I don't know" },
+  { v:'a', text: "you never do" },
+  { v:'a', text: "you never step in. not once. not ever." },
+  { v:'k', text: "I used to think I'd fight for her" },
+  { v:'a', text: "you don't fight for anyone. not even yourself" },
+  { v:'k', text: "that's not true", hold: 1900 },
+  { v:'a', text: "prove it", hold: 1400 },
+  { v:'void', hold: 3200 },
+  { v:'a', text: "that's what I thought", quiet:true },
+  { v:'k', text: "I don't know who I am anymore", small:true },
+  { v:'merge', text: "you're exactly who you've always been", hold: 3600 },
+];
+
+const spiral = document.getElementById('spiral');
+const blackout = document.getElementById('blackout');
+const flinch = document.getElementById('flinch');
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function metrics(realCount){
+  const base = Math.min(window.innerWidth, window.innerHeight);
+  return {
+    maxRadius: base * 0.36,
+    step: (base * 0.36) / (realCount + 3),
+    turnDeg: 24,
+  };
+}
+
+async function build(){
+  spiral.innerHTML = '';
+  const realCount = lines.filter(l => l.v !== 'void').length;
+  const { maxRadius, step, turnDeg } = metrics(realCount);
+  const els = [];
+  let elIndex = 0;
+  let lastRealEl = null;
+  let lastRealVoice = null;
+
+  for (let li=0; li<lines.length; li++){
+    const item = lines[li];
+
+    if (item.v === 'void'){
+      flinch.classList.add('on');
+      await sleep(280);
+      flinch.classList.remove('on');
+      await sleep(item.hold - 280);
+      continue;
+    }
+
+    const proximity = elIndex / (realCount - 1);
+    const radius = Math.max(12, maxRadius - elIndex * step);
+    const rad = (elIndex * turnDeg) * Math.PI / 180;
+    const x = radius * Math.cos(rad);
+    const y = radius * Math.sin(rad);
+    const tilt = (elIndex % 2 === 0 ? 1 : -1) * Math.min(6, elIndex * 0.5);
+
+    const el = document.createElement('div');
+    el.className = 'line ' + (item.v === 'merge' ? 'merge' : item.v);
+    el.textContent = item.text;
+
+    let size;
+    if (item.v === 'a') size = 1.0 + proximity * 0.6;
+    else if (item.v === 'merge') size = 1.75;
+    else size = (item.small ? 0.85 : 1.05) + proximity * 0.3;
+    el.style.fontSize = size + 'rem';
+
+    if (item.v === 'a' && !item.quiet){
+      el.style.color = proximity > 0.75 ? 'var(--attack-hot)' : 'var(--attack)';
+      el.classList.add(proximity > 0.6 ? 'jitter-hard' : 'jitter');
+    } else if (item.v === 'a' && item.quiet){
+      el.style.color = 'var(--attack)';
+    }
+
+    el.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px) rotate(${tilt}deg) scale(0.9)`;
+    spiral.appendChild(el);
+    els.push(el);
+    elIndex++;
+
+    void el.offsetWidth;
+    const targetOpacity = item.v === 'k' ? (0.5 + proximity * 0.5)
+                         : item.v === 'merge' ? 1
+                         : (0.7 + proximity * 0.3);
+    el.style.opacity = String(targetOpacity);
+    el.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px) rotate(${tilt}deg) scale(1)`;
+
+    if (lastRealEl && lastRealVoice === 'k'){
+      lastRealEl.style.opacity = String(Math.max(0.2, parseFloat(lastRealEl.style.opacity) - 0.22));
+    }
+    lastRealEl = el;
+    lastRealVoice = item.v === 'merge' ? 'merge' : item.v;
+
+    const hold = item.hold ? item.hold
+               : item.text.length > 34 ? 1750
+               : 1150;
+    await sleep(hold);
+  }
+
+  return els;
+}
+
+async function snap(els){
+  els.forEach((el, i) => {
+    el.style.transition = 'opacity 0.9s ease, transform 0.9s ease';
+    const dx = (Math.random()-0.5) * window.innerWidth * 1.5;
+    const dy = (Math.random()-0.5) * window.innerHeight * 1.5;
+    setTimeout(() => {
+      el.style.opacity = '0';
+      el.style.transform += ` translate(${dx}px, ${dy}px)`;
+    }, i * 10);
+  });
+  await sleep(950);
+}
+
+async function loop(){
+  let rotation = 0;
+  while(true){
+    const els = await build();
+    await sleep(700);
+    await snap(els);
+
+    blackout.classList.add('on');
+    await sleep(2800);
+    blackout.classList.remove('on');
+
+    rotation += 5;
+    spiral.style.transition = 'transform 70s linear';
+    spiral.style.transform = `rotate(${rotation}deg)`;
+    await sleep(400);
+  }
+}
+
+loop();
+</script>
+</body>
+</html>
