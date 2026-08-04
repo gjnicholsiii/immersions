@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>the only one I tell</title>
+<style>
+  :root{
+    --bg:#0b0a09;
+    --cream:#e8e1d3;
+    --cream-dim:#cfc6b4;
+    --red:#b8382f;
+    --red-dim:#7a2723;
+    --red-old:#4a1e1c;
+    --warm-glow: rgba(232,196,150,0.28);
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  }
+  .vignette{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 44%, transparent 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.68) 78%);
+    pointer-events:none;
+    animation: breathe 9s ease-in-out infinite alternate;
+    z-index:5;
+  }
+  @keyframes breathe{
+    0%{opacity:.75;}
+    100%{opacity:1;}
+  }
+  .ghost-layer{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:1;
+  }
+  .ghost-word{
+    position:absolute;
+    top:0; left:0;
+    font-family: 'Courier New', ui-monospace, monospace;
+    color: var(--red);
+    font-size: clamp(0.85rem, 1.9vw, 1.2rem);
+    letter-spacing: 0.03em;
+    white-space:nowrap;
+    opacity:0;
+    transform: translate(-50%,-50%) scale(1);
+    transition: transform 3.6s cubic-bezier(.16,1,.3,1), opacity 2.8s ease, color 6s ease;
+    will-change: transform, opacity;
+  }
+  .stage{
+    position:fixed;
+    top:44%; left:50%;
+    transform: translate(-50%,-50%);
+    width:min(88vw, 720px);
+    text-align:center;
+    z-index:3;
+    min-height: 3.6em;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap: 0.35em 0.5em;
+  }
+  .word{
+    display:inline-block;
+    font-style:italic;
+    color:var(--cream);
+    font-size: clamp(1.1rem, 2.8vw, 1.95rem);
+    line-height:1.4;
+    opacity:0;
+    transform: translateY(4px) scale(0.97);
+    transition: opacity .5s ease, transform .5s ease, text-shadow 1.2s ease;
+    letter-spacing:0.01em;
+  }
+  .word.in{ opacity:1; transform:translateY(0) scale(1); }
+  .word.leaving{
+    opacity:0 !important;
+    transform: translateY(-6px) scale(0.94) !important;
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  /* mode-specific styling on the stage word */
+  .mode-anger .word.in{ animation: jitter 0.14s ease-in-out 2; }
+  @keyframes jitter{
+    0%{ transform: translate(0,0) scale(1); }
+    25%{ transform: translate(1px,-1px) scale(1); }
+    50%{ transform: translate(-1px,1px) scale(1); }
+    75%{ transform: translate(1px,1px) scale(1); }
+    100%{ transform: translate(0,0) scale(1); }
+  }
+  .mode-fear .word{ transform: translateY(6px) scale(0.9); }
+  .mode-fear .word.in{ transform: translateY(0) scale(0.9); }
+  .mode-doubt .word.flicker{ animation: flick 0.6s ease-in-out; }
+  @keyframes flick{
+    0%{opacity:1;} 30%{opacity:0.15;} 55%{opacity:0.85;} 75%{opacity:0.25;} 100%{opacity:1;}
+  }
+  .mode-love .word.in{ text-shadow: 0 0 16px var(--warm-glow); }
+
+  .cursor{
+    display:inline-block;
+    width: 1px;
+    height: 1.2em;
+    background: var(--cream-dim);
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    animation: blink 1s steps(1) infinite;
+    opacity:0.85;
+  }
+  @keyframes blink{
+    0%, 49%{ opacity:0.85; }
+    50%, 100%{ opacity:0; }
+  }
+  .credit{
+    position:fixed; bottom: 18px; left:0; right:0;
+    text-align:center;
+    color: #3a3632;
+    font-family: 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    z-index:4;
+    user-select:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="vignette"></div>
+<div class="ghost-layer" id="ghostLayer"></div>
+<div class="stage" id="stage"></div>
+<div class="credit">the only one I tell</div>
+
+<script>
+/*
+  Four movements: anger, fear, doubt, love.
+  Each round: his line types in (cream, italic). It holds.
+  Then it does not fracture into copies of itself —
+  it dissolves, swallowed, and what erupts and persists
+  in the space afterward are her lines instead (red, monospace).
+  Anger/fear/doubt throw her words out across the whole screen —
+  public, loud, for anyone.
+  Love keeps her words close, orbiting near him instead of leaving —
+  the one that should have stayed private never actually gets far.
+*/
+
+const rounds = [
+  {
+    mode: 'anger',
+    his: "you don't get to do that in front of people",
+    her: ["relax.", "you're being dramatic", "it was a joke", "you always do this"],
+    speed: 55,
+    hold: 1100,
+    ghostDur: 2600,
+    spread: 'wide',
+  },
+  {
+    mode: 'fear',
+    his: "I don't know how to fix this",
+    her: ["that's not my problem", "grow up", "figure it out", "poor thing"],
+    speed: 130,
+    hold: 1500,
+    ghostDur: 4200,
+    spread: 'low',
+  },
+  {
+    mode: 'doubt',
+    his: "maybe I really am the problem",
+    her: ["finally.", "took you long enough", "I've been saying it", "obviously"],
+    speed: 105,
+    hold: 1300,
+    ghostDur: 3400,
+    spread: 'wide',
+  },
+  {
+    mode: 'love',
+    his: "you're still the only one I tell things to",
+    her: ["how sweet.", "tell everyone then", "say it louder", "go on"],
+    speed: 145,
+    hold: 1900,
+    ghostDur: 3000,
+    spread: 'close',
+  },
+];
+
+const stage = document.getElementById('stage');
+const ghostLayer = document.getElementById('ghostLayer');
+
+let ghostCount = 0;
+const GHOST_CAP = 40;
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function makeCursor(){
+  const c = document.createElement('span');
+  c.className = 'cursor';
+  return c;
+}
+
+async function typeLine(text, mode, speed){
+  stage.className = 'stage mode-' + mode;
+  stage.innerHTML = '';
+  const words = text.split(' ');
+  const spans = [];
+  for (let i=0; i<words.length; i++){
+    const w = document.createElement('span');
+    w.className = 'word';
+    w.textContent = words[i];
+    stage.appendChild(w);
+    spans.push(w);
+  }
+  const cursor = makeCursor();
+  stage.appendChild(cursor);
+
+  for (let i=0; i<spans.length; i++){
+    await sleep(speed + Math.random()*speed*0.7);
+    // doubt mode: occasionally hesitate — flicker a prior word before continuing
+    if (mode === 'doubt' && i > 0 && Math.random() < 0.4){
+      spans[i-1].classList.add('flicker');
+      await sleep(300);
+    }
+    spans[i].classList.add('in');
+  }
+  await sleep(500);
+  cursor.remove();
+  return spans;
+}
+
+function stageCenter(){
+  const r = stage.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
+}
+
+function spawnGhost(originX, originY, text, spread, ghostDur){
+  const g = document.createElement('span');
+  g.className = 'ghost-word';
+  g.textContent = text;
+  ghostLayer.appendChild(g);
+
+  g.style.transition = 'none';
+  g.style.left = originX + 'px';
+  g.style.top = originY + 'px';
+  g.style.opacity = '0';
+  void g.offsetWidth;
+
+  g.style.transition = `transform ${ghostDur/1000}s cubic-bezier(.16,1,.3,1), opacity ${ghostDur/1000*0.85}s ease, color 6s ease`;
+
+  let targetX, targetY, startOpacity;
+  const center = stageCenter();
+
+  if (spread === 'wide'){
+    targetX = Math.random() * window.innerWidth;
+    targetY = Math.random() * window.innerHeight;
+    startOpacity = 0.82 + Math.random()*0.16;
+  } else if (spread === 'low'){
+    targetX = Math.random() * window.innerWidth;
+    targetY = window.innerHeight * (0.68 + Math.random()*0.28);
+    startOpacity = 0.72 + Math.random()*0.16;
+  } else { // close — orbits near him, never really leaves
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 60 + Math.random()*140;
+    targetX = center.x + Math.cos(angle) * radius;
+    targetY = center.y + Math.sin(angle) * radius;
+    startOpacity = 0.85 + Math.random()*0.13;
+  }
+
+  requestAnimationFrame(() => {
+    g.style.left = targetX + 'px';
+    g.style.top = targetY + 'px';
+    g.style.opacity = String(startOpacity);
+  });
+
+  // ambient drift forever after arrival — amplitude depends on spread
+  const amp = spread === 'close' ? 18 : 40;
+  const driftX = (Math.random()-0.5) * amp;
+  const driftY = (Math.random()-0.5) * amp;
+  const dur = 12 + Math.random()*10;
+  setTimeout(() => {
+    g.animate([
+      { transform: `translate(-50%,-50%) translate(0px,0px)` },
+      { transform: `translate(-50%,-50%) translate(${driftX}px,${driftY}px)` },
+      { transform: `translate(-50%,-50%) translate(0px,0px)` }
+    ], { duration: dur*1000, iterations: Infinity, easing: 'ease-in-out' });
+  }, ghostDur);
+
+  // age toward a duller red, but stay readable — never fully gone
+  setTimeout(() => {
+    g.style.color = 'var(--red-dim)';
+    g.style.opacity = String(Math.max(0.55, startOpacity * 0.75));
+  }, 9000 + Math.random()*4000);
+
+  ghostCount++;
+  if (ghostCount > GHOST_CAP){
+    const oldest = ghostLayer.firstElementChild;
+    if (oldest){
+      oldest.style.opacity = '0';
+      setTimeout(() => oldest.remove(), 2600);
+    }
+  }
+}
+
+async function dissolveHis(spans){
+  spans.forEach((s, i) => {
+    setTimeout(() => s.classList.add('leaving'), i * 40);
+  });
+  await sleep(400 + spans.length * 40);
+  stage.innerHTML = '';
+}
+
+async function eruptHers(round){
+  const center = stageCenter();
+  const phrases = round.her;
+  for (let i=0; i<phrases.length; i++){
+    const jitterX = center.x + (Math.random()-0.5) * 60;
+    const jitterY = center.y + (Math.random()-0.5) * 30;
+    spawnGhost(jitterX, jitterY, phrases[i], round.spread, round.ghostDur);
+    await sleep(180 + Math.random()*160);
+  }
+}
+
+async function emptyPause(ms){
+  const cursor = makeCursor();
+  stage.appendChild(cursor);
+  await sleep(ms);
+  cursor.remove();
+  stage.innerHTML = '';
+  await sleep(350);
+}
+
+async function loop(){
+  let i = 0;
+  while(true){
+    const round = rounds[i % rounds.length];
+    i++;
+    const spans = await typeLine(round.his, round.mode, round.speed);
+    await sleep(round.hold);
+    // his line dissolves, and as it goes, her lines erupt into the space
+    dissolveHis(spans);
+    await sleep(150);
+    await eruptHers(round);
+    await emptyPause(1600);
+  }
+}
+
+loop();
+</script>
+</body>
+</html>
