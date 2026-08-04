@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>no further action</title>
+<style>
+  :root{
+    --bg:#141310;
+    --paper:#1a1815;
+    --text:#cfc9ba;
+    --text-dim:#8f8a7a;
+    --bar:#060605;
+    --meta:#5c574a;
+    --stamp:#3d4f63;
+    --stamp-dim:#28323d;
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family: 'Courier New', ui-monospace, monospace;
+  }
+  .texture{
+    position:fixed; inset:0;
+    background:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.008) 0px, rgba(255,255,255,0.008) 1px, transparent 1px, transparent 3px),
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.02), transparent 50%);
+    pointer-events:none;
+    z-index:5;
+  }
+  .vignette{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 40%, transparent 0%, rgba(0,0,0,0.55) 85%);
+    pointer-events:none;
+    z-index:6;
+  }
+  .frame{
+    position:fixed; inset: 6vh 8vw;
+    z-index:2;
+    display:flex;
+    flex-direction:column;
+  }
+  .header{
+    color: var(--meta);
+    font-size: 0.66rem;
+    letter-spacing: 0.14em;
+    text-transform:uppercase;
+    border-bottom: 1px solid #2a2822;
+    padding-bottom: 10px;
+    margin-bottom: 18px;
+    display:flex;
+    justify-content:space-between;
+  }
+  .log{
+    flex:1;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap: 22px;
+  }
+  .entry{
+    display:flex;
+    align-items:baseline;
+    flex-wrap:wrap;
+    gap: 8px 0;
+    opacity:0;
+    transform: translateY(8px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  .entry.in{ opacity:1; transform: translateY(0); }
+  .entryNum{
+    color: var(--meta);
+    font-size:0.65rem;
+    letter-spacing:0.08em;
+    margin-right: 12px;
+    min-width: 62px;
+    flex-shrink:0;
+  }
+  .entryText{
+    display:flex;
+    flex-wrap:wrap;
+    font-size: clamp(0.95rem, 2vw, 1.15rem);
+    color: var(--text);
+    line-height:1.6;
+  }
+  .word{
+    position:relative;
+    display:inline-block;
+    margin-right: 0.45em;
+    color: var(--text);
+    white-space:nowrap;
+  }
+  .word .bar{
+    position:absolute;
+    top: -2px; bottom:-2px; left:-2px;
+    width: 0%;
+    background: var(--bar);
+    transition: width 0.5s cubic-bezier(.7,0,.3,1);
+    z-index:1;
+  }
+  .word.redacted .bar{ width: calc(100% + 4px); }
+  .stamp{
+    display:inline-flex;
+    align-items:center;
+    margin-left: 14px;
+    padding: 2px 10px;
+    border: 1.5px solid var(--stamp);
+    color: var(--stamp);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform:uppercase;
+    font-weight:bold;
+    transform: rotate(-3deg) scale(1.6);
+    opacity:0;
+    transition: transform .35s cubic-bezier(.34,1.6,.64,1), opacity .3s ease;
+  }
+  .stamp.in{
+    opacity:0.88;
+    transform: rotate(-3deg) scale(1);
+  }
+  .cursorRow{
+    display:flex;
+    align-items:center;
+    color: var(--meta);
+    font-size:0.8rem;
+    margin-top: 10px;
+    min-height: 1.4em;
+  }
+  .cursorRow .blink{
+    display:inline-block;
+    width:7px; height:1em;
+    background: var(--meta);
+    margin-left:6px;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink{
+    0%,49%{opacity:1;} 50%,100%{opacity:0;}
+  }
+  .footer{
+    color: var(--meta);
+    font-size: 0.62rem;
+    letter-spacing:0.1em;
+    padding-top: 10px;
+    border-top: 1px solid #2a2822;
+    margin-top: 16px;
+    display:flex;
+    justify-content:space-between;
+  }
+</style>
+</head>
+<body>
+
+<div class="texture"></div>
+<div class="vignette"></div>
+
+<div class="frame">
+  <div class="header">
+    <span>internal record — draft</span>
+    <span id="statusLine">status: open</span>
+  </div>
+  <div class="log" id="log"></div>
+  <div class="cursorRow"><span id="cursorLabel">awaiting entry</span><span class="blink"></span></div>
+  <div class="footer">
+    <span>reviewed by: self</span>
+    <span id="entryCount">0 entries closed</span>
+  </div>
+</div>
+
+<script>
+/*
+  Not a confession that gets spoken and then punished for it.
+  A record that never gets to stay honest long enough to matter.
+  Each line goes up whole. Then, word by word, black bars slide
+  down over most of it — not all at once, not violently, just
+  procedurally, the way a person edits themselves without
+  deciding to. What's left legible is never the true sentence,
+  just its connective tissue. Then it gets stamped closed by
+  the same hand that wrote it. The log only grows. Nothing here
+  is ever revisited, corrected, or said again out loud.
+*/
+
+const entries = [
+  { text: "she humiliated me in front of my own family", keep: [0,4,6], stamp: "closed w/o action" },
+  { text: "I froze instead of saying anything", keep: [0,2], stamp: "not filed" },
+  { text: "I keep finding reasons it wasn't that bad", keep: [0,1,7,8], stamp: "pending review" },
+  { text: "I told myself I was being dramatic", keep: [0,1,3], stamp: "n/a" },
+  { text: "I let her walk away like I agreed", keep: [0,2,7], stamp: "withdrawn" },
+  { text: "I don't remember the last time I said what I meant", keep: [0,1,9,10], stamp: "see attached" },
+];
+
+const log = document.getElementById('log');
+const cursorLabel = document.getElementById('cursorLabel');
+const entryCount = document.getElementById('entryCount');
+const statusLine = document.getElementById('statusLine');
+
+let count = 0;
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+async function addEntry(entry, num){
+  const row = document.createElement('div');
+  row.className = 'entry';
+
+  const numEl = document.createElement('div');
+  numEl.className = 'entryNum';
+  numEl.textContent = 'entry ' + String(num).padStart(3,'0');
+  row.appendChild(numEl);
+
+  const textEl = document.createElement('div');
+  textEl.className = 'entryText';
+  const words = entry.text.split(' ');
+  const wordEls = [];
+  words.forEach((w) => {
+    const wEl = document.createElement('span');
+    wEl.className = 'word';
+    const bar = document.createElement('span');
+    bar.className = 'bar';
+    wEl.appendChild(bar);
+    wEl.appendChild(document.createTextNode(w));
+    textEl.appendChild(wEl);
+    wordEls.push(wEl);
+  });
+  row.appendChild(textEl);
+
+  const stampEl = document.createElement('span');
+  stampEl.className = 'stamp';
+  stampEl.textContent = entry.stamp;
+  row.appendChild(stampEl);
+
+  log.appendChild(row);
+  void row.offsetWidth;
+  row.classList.add('in');
+  log.scrollTop = log.scrollHeight;
+
+  await sleep(1400);
+
+  // redact everything except the words marked to keep — done word by word,
+  // unevenly paced, like someone talking themselves down mid-sentence
+  for (let i=0; i<wordEls.length; i++){
+    if (!entry.keep.includes(i)){
+      await sleep(90 + Math.random()*220);
+      wordEls[i].classList.add('redacted');
+    }
+  }
+
+  await sleep(500);
+  stampEl.classList.add('in');
+  count++;
+  entryCount.textContent = count + ' entries closed';
+
+  await sleep(1200);
+}
+
+async function loop(){
+  let i = 0;
+  while(true){
+    cursorLabel.textContent = 'drafting';
+    await sleep(700);
+    const entry = entries[i % entries.length];
+    await addEntry(entry, i+1);
+    i++;
+    cursorLabel.textContent = 'awaiting entry';
+    statusLine.textContent = 'status: open — ' + count + ' closed, 0 addressed';
+    await sleep(1600);
+
+    // keep the log from growing forever off-screen — retire the oldest quietly
+    if (log.children.length > 5){
+      const oldest = log.firstElementChild;
+      oldest.style.transition = 'opacity 1.4s ease';
+      oldest.style.opacity = '0.28';
+    }
+  }
+}
+
+loop();
+</script>
+</body>
+</html>
