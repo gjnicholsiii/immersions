@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>how gently it's said</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Petit+Formal+Script&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#120d0a;
+    --gold:#e8c98a;
+    --gold-dim:#8f7a4f;
+    --ugly1:#c23838;
+    --ugly2:#8a2c2c;
+    --ugly-bg:#1c0a08;
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family: Georgia, 'Iowan Old Style', serif;
+  }
+  .glow{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 30%, rgba(232,201,138,0.06), transparent 55%);
+    pointer-events:none;
+    animation: breathe 7s ease-in-out infinite alternate;
+    z-index:2;
+  }
+  @keyframes breathe{
+    0%{ opacity:0.6; } 100%{ opacity:1; }
+  }
+  .vignette{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 40%, transparent 0%, rgba(0,0,0,0.75) 82%);
+    pointer-events:none;
+    z-index:6;
+  }
+
+  .beautifulWrap{
+    position:fixed;
+    top: 30%; left:50%;
+    transform: translate(-50%,-50%);
+    width:min(84vw, 720px);
+    text-align:center;
+    z-index:3;
+  }
+  .rule{
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 0 auto 22px auto;
+    transition: width 1.8s ease;
+  }
+  .rule.in{ width: 40%; }
+  .beautiful{
+    font-family: 'Petit Formal Script', 'Dancing Script', 'Segoe Script', cursive;
+    font-style:normal;
+    font-weight:400;
+    color: var(--gold);
+    font-size: clamp(2rem, 5.6vw, 3.6rem);
+    line-height:1.7;
+    letter-spacing: 0.005em;
+    text-shadow: 0 0 22px rgba(232,201,138,0.4);
+    opacity:0;
+    transform: translateY(10px);
+    transition: opacity 2.4s ease, transform 2.4s ease, text-shadow 2s ease, letter-spacing 2.8s ease;
+  }
+  .beautiful.in{
+    opacity:1;
+    transform: translateY(0);
+    letter-spacing: 0.02em;
+  }
+  .beautiful.leaving{
+    opacity:0;
+    transform: translateY(-14px);
+    transition: opacity 2.6s ease, transform 2.6s ease;
+  }
+
+  .uglyBox{
+    position:fixed;
+    bottom: 7vh; left:50%;
+    transform: translateX(-50%);
+    width:min(80vw, 640px);
+    max-height: 22vh;
+    overflow:hidden;
+    text-align:center;
+    z-index:4;
+    padding: 10px 14px;
+  }
+  .ugly{
+    display:inline;
+    font-family:'Courier New', ui-monospace, monospace;
+    font-weight:bold;
+    font-size: clamp(1rem, 2.3vw, 1.3rem);
+    line-height:1.65;
+    letter-spacing: 0.01em;
+    opacity:0;
+    transform: scaleY(1);
+    transform-origin: center bottom;
+    transition: opacity 0.06s linear;
+  }
+  .ugly.in{ opacity:1; }
+  .ugly.crushed{
+    opacity:0 !important;
+    transform: scaleY(0.05) !important;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .ugly .u-letter{
+    display:inline-block;
+    white-space:pre;
+  }
+</style>
+</head>
+<body>
+
+<div class="glow"></div>
+<div class="beautifulWrap"><div class="rule" id="rule"></div><div class="beautiful" id="beautiful"></div></div>
+<div class="uglyBox"><span class="ugly" id="ugly"></span></div>
+<div class="vignette"></div>
+
+<script>
+/*
+  Two registers, never touching. One gets the whole top of the
+  screen, soft gold light, room to breathe, all the time it wants
+  to arrive and all the grace it wants to leave. The other gets a
+  cramped strip at the bottom, no glow, no patience, every letter
+  sitting at a slightly wrong height like it was never allowed to
+  settle. The first one always gets to finish its sentence and
+  drift off intact. The second one never does. It gets cut off
+  mid-word, stamped down, every single time, like a hand closing
+  over a mouth before the last syllable can get out.
+*/
+
+const rounds = [
+  {
+    beautiful: "You're crazy. You're losing your mind.",
+    ugly: "I'm not crazy. I'm NOT. stop saying that like you know something I don't, stop saying it like it's already decided, I'm not",
+  },
+  {
+    beautiful: "That never happened. You're making things up.",
+    ugly: "it happened. IT HAPPENED. I was there. why do you get to decide what happened, I was standing right there and it",
+  },
+  {
+    beautiful: "You're too sensitive. You take everything too personally.",
+    ugly: "maybe I am. maybe I just feel it. so what. SO WHAT. why is that the thing we're fighting about instead of what you actually",
+  },
+  {
+    beautiful: "I was only joking. You have no sense of humor.",
+    ugly: "it wasn't funny. it was never funny. why do I have to laugh at the thing that hurt, why is that funny to",
+  },
+  {
+    beautiful: "Look what you made me do.",
+    ugly: "I didn't make you do anything. I didn't. say it again and I might actually start believing you, I might actually start",
+  },
+  {
+    beautiful: "If you really loved me, you wouldn't...",
+    ugly: "don't. don't finish that sentence. don't turn love into a leash and hand it to me and call it a gift, don't",
+  },
+  {
+    beautiful: "You're imagining things. You're reading too much into it.",
+    ugly: "I saw what I saw. I SAW IT. stop making me doubt my own eyes, stop making me doubt the one thing I still",
+  },
+  {
+    beautiful: "Nobody else would put up with you. You'd never survive out there without me.",
+    ugly: "maybe that's true. god, what if that's true. what if there's nowhere else, what if you're the only place left that'll even",
+  },
+  {
+    beautiful: "You're the one who's actually toxic.",
+    ugly: "no. NO. don't flip it. don't you dare flip it, I know what happened, I know who did what, don't you",
+  },
+  {
+    beautiful: "I never said that. You're twisting my words.",
+    ugly: "you said it. you SAID it. I'm not crazy, I'm not making it up, you said it and now you're making me the",
+  },
+];
+
+const beautifulEl = document.getElementById('beautiful');
+const ruleEl = document.getElementById('rule');
+const uglyEl = document.getElementById('ugly');
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function renderUglyLetters(text){
+  uglyEl.innerHTML = '';
+  const words = text.split(' ');
+  words.forEach((w) => {
+    const s = document.createElement('span');
+    s.className = 'u-letter';
+    s.textContent = w + '\u00A0';
+    const rot = (Math.random()-0.5) * 5;
+    const yoff = (Math.random()-0.5) * 3;
+    const colorPick = Math.random() < 0.75 ? 'var(--ugly1)' : 'var(--ugly2)';
+    s.style.display = 'inline-block';
+    s.style.transform = `translateY(${yoff}px) rotate(${rot}deg)`;
+    s.style.color = colorPick;
+    uglyEl.appendChild(s);
+  });
+}
+
+function jitterUgly(){
+  const words = uglyEl.querySelectorAll('.u-letter');
+  words.forEach(w => {
+    const rot = (Math.random()-0.5) * 6;
+    const yoff = (Math.random()-0.5) * 3.5;
+    w.style.transform = `translateY(${yoff}px) rotate(${rot}deg)`;
+  });
+}
+
+async function runRound(round){
+  // a thin line draws in first, like a curtain being readied
+  ruleEl.classList.add('in');
+  await sleep(500);
+
+  // the beautiful line arrives slowly, unhurried, glowing, opening up letter by letter
+  beautifulEl.className = 'beautiful';
+  beautifulEl.textContent = round.beautiful;
+  void beautifulEl.offsetWidth;
+  beautifulEl.classList.add('in');
+  await sleep(2600);
+
+  // it sits there, composed, for a while, before anything answers it
+  await sleep(1400);
+
+  // the response does not arrive gently — it's already jittering
+  // the instant it appears, crammed low, no room
+  renderUglyLetters(round.ugly);
+  uglyEl.classList.remove('crushed');
+  uglyEl.classList.add('in');
+
+  let jitterCount = 0;
+  const jitterInterval = setInterval(() => {
+    jitterUgly();
+    jitterCount++;
+  }, 110);
+
+  await sleep(2600);
+
+  // the beautiful line gets to leave first, gracefully, untouched
+  beautifulEl.classList.remove('in');
+  beautifulEl.classList.add('leaving');
+  ruleEl.classList.remove('in');
+  await sleep(1400);
+
+  // the response does not get to finish. it gets stamped down mid-sentence.
+  clearInterval(jitterInterval);
+  uglyEl.classList.add('crushed');
+  await sleep(700);
+  uglyEl.classList.remove('in','crushed');
+  beautifulEl.className = 'beautiful';
+
+  await sleep(1600);
+}
+
+async function loop(){
+  let i = 0;
+  while(true){
+    await runRound(rounds[i % rounds.length]);
+    i++;
+  }
+}
+
+loop();
+</script>
+</body>
+</html>
