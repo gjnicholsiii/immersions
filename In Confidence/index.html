@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>kept in confidence</title>
+<style>
+  :root{
+    --bg:#0b0a09;
+    --cream:#e8e1d3;
+    --cream-dim:#cfc6b4;
+    --red:#a3342e;
+    --red-dim:#7a2723;
+    --red-old:#52201e;
+    --ghost:#3c3733;
+  }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+  }
+  .vignette{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at 50% 44%, transparent 0%, rgba(0,0,0,0.15) 45%, rgba(0,0,0,0.65) 78%);
+    pointer-events:none;
+    animation: breathe 9s ease-in-out infinite alternate;
+    z-index:5;
+  }
+  @keyframes breathe{
+    0%{opacity:.75;}
+    100%{opacity:1;}
+  }
+  .ghost-layer{
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index:1;
+  }
+  .ghost-word{
+    position:absolute;
+    top:0; left:0;
+    font-family: 'Courier New', ui-monospace, monospace;
+    color: var(--red-dim);
+    font-size: clamp(0.68rem, 1.5vw, 0.95rem);
+    letter-spacing: 0.03em;
+    white-space:nowrap;
+    opacity:0;
+    transform: translate(-50%,-50%);
+    transition: transform 3.4s cubic-bezier(.16,1,.3,1), opacity 2.6s ease, color 6s ease;
+    will-change: transform, opacity;
+  }
+  .stage{
+    position:fixed;
+    top:44%; left:50%;
+    transform: translate(-50%,-50%);
+    width:min(86vw, 720px);
+    text-align:center;
+    z-index:3;
+    min-height: 3.6em;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap: 0.35em 0.5em;
+  }
+  .word{
+    display:inline-block;
+    font-style:italic;
+    color:var(--cream);
+    font-size: clamp(1.15rem, 2.9vw, 2rem);
+    line-height:1.4;
+    opacity:0;
+    transform: translateY(4px);
+    transition: opacity .5s ease, transform .5s ease;
+    letter-spacing:0.01em;
+  }
+  .word.in{ opacity:1; transform:translateY(0); }
+  .word.held{
+    color: var(--cream);
+    text-shadow: 0 0 14px rgba(232,225,211,0.25);
+  }
+  .word.leaving{
+    opacity:0 !important;
+    transform: translateY(-6px) scale(0.96) !important;
+    transition: opacity .55s ease, transform .55s ease;
+  }
+  .cursor{
+    display:inline-block;
+    width: 1px;
+    height: 1.2em;
+    background: var(--cream-dim);
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    animation: blink 1s steps(1) infinite;
+    opacity:0.85;
+  }
+  @keyframes blink{
+    0%, 49%{ opacity:0.85; }
+    50%, 100%{ opacity:0; }
+  }
+  .credit{
+    position:fixed; bottom: 18px; left:0; right:0;
+    text-align:center;
+    color: #3a3632;
+    font-family: 'Courier New', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    z-index:4;
+    user-select:none;
+  }
+</style>
+</head>
+<body>
+
+<div class="vignette"></div>
+<div class="ghost-layer" id="ghostLayer"></div>
+<div class="stage" id="stage"></div>
+<div class="credit">kept in confidence</div>
+
+<script>
+const confessions = [
+  "only tell you this once",
+  "I still do it when no one's looking",
+  "I was scared the whole time",
+  "I never told anyone else",
+  "don't repeat this",
+  "I think I'm not who you think I am",
+  "you're the only one who knows"
+];
+
+const stage = document.getElementById('stage');
+const ghostLayer = document.getElementById('ghostLayer');
+
+let idx = 0;
+let ghostCount = 0;
+const GHOST_CAP = 46;
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+function makeCursor(){
+  const c = document.createElement('span');
+  c.className = 'cursor';
+  return c;
+}
+
+async function typeLine(text){
+  stage.innerHTML = '';
+  const words = text.split(' ');
+  const spans = [];
+  for (let i=0; i<words.length; i++){
+    const w = document.createElement('span');
+    w.className = 'word';
+    w.textContent = words[i];
+    stage.appendChild(w);
+    spans.push(w);
+  }
+  const cursor = makeCursor();
+  stage.appendChild(cursor);
+
+  for (let i=0; i<spans.length; i++){
+    await sleep(90 + Math.random()*90);
+    spans[i].classList.add('in');
+  }
+  await sleep(650);
+  cursor.remove();
+  return spans;
+}
+
+function holdLine(spans){
+  spans.forEach(s => s.classList.add('held'));
+}
+
+function releaseAtPosition(el){
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2, text: el.textContent };
+}
+
+function spawnGhost(originX, originY, text){
+  const g = document.createElement('span');
+  g.className = 'ghost-word';
+  g.textContent = text;
+  ghostLayer.appendChild(g);
+
+  // place at origin instantly (no transition yet)
+  g.style.transition = 'none';
+  g.style.left = originX + 'px';
+  g.style.top = originY + 'px';
+  g.style.opacity = '0';
+  // force reflow
+  void g.offsetWidth;
+
+  // restore transition, animate outward
+  g.style.transition = '';
+  const targetX = Math.random() * window.innerWidth;
+  const targetY = Math.random() * window.innerHeight;
+  const startOpacity = 0.5 + Math.random()*0.15;
+
+  requestAnimationFrame(() => {
+    g.style.left = targetX + 'px';
+    g.style.top = targetY + 'px';
+    g.style.opacity = startOpacity;
+  });
+
+  // ambient slow drift, forever, distinct per ghost
+  const driftX = (Math.random()-0.5) * 40;
+  const driftY = (Math.random()-0.5) * 40;
+  const dur = 14 + Math.random()*10;
+  let t = 0;
+  const anim = g.animate([
+    { transform: `translate(-50%,-50%) translate(0px,0px)` },
+    { transform: `translate(-50%,-50%) translate(${driftX}px,${driftY}px)` },
+    { transform: `translate(-50%,-50%) translate(0px,0px)` }
+  ], { duration: dur*1000, iterations: Infinity, easing: 'ease-in-out' });
+
+  // long slow fade toward old-ghost color, never fully gone
+  setTimeout(() => {
+    g.style.color = 'var(--red-old)';
+    g.style.opacity = String(startOpacity * 0.55);
+  }, 9000 + Math.random()*4000);
+
+  ghostCount++;
+  if (ghostCount > GHOST_CAP){
+    const oldest = ghostLayer.firstElementChild;
+    if (oldest){
+      oldest.style.opacity = '0';
+      setTimeout(() => oldest.remove(), 2600);
+    }
+  }
+}
+
+async function fractureLine(spans){
+  // capture positions before removing from stage
+  const releases = spans.map(releaseAtPosition);
+  spans.forEach(s => s.classList.add('leaving'));
+  releases.forEach((pos, i) => {
+    setTimeout(() => spawnGhost(pos.x, pos.y, pos.text), i * 70);
+  });
+  await sleep(500 + releases.length * 70);
+  stage.innerHTML = '';
+}
+
+async function emptyPause(){
+  const cursor = makeCursor();
+  stage.appendChild(cursor);
+  await sleep(1500);
+  cursor.remove();
+  stage.innerHTML = '';
+  await sleep(400);
+}
+
+async function loop(){
+  while(true){
+    const text = confessions[idx % confessions.length];
+    idx++;
+    const spans = await typeLine(text);
+    holdLine(spans);
+    await sleep(1450);
+    await fractureLine(spans);
+    await emptyPause();
+  }
+}
+
+loop();
+</script>
+</body>
+</html>
